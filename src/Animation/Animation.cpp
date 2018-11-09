@@ -1,6 +1,25 @@
 #include "Animation.hpp"
 
 
+void Animation::toggleInvisibility(){
+    sf::Color newColor;
+
+    if(invisible)
+        newColor = sf::Color{255, 255, 255, 255};
+
+    else newColor = sf::Color{255, 255, 255, 0};
+
+    for(auto frame : frames)   
+        frame.setColor(newColor);
+
+    invisible = !invisible;
+}
+
+bool Animation::isInvisible(){
+    return invisible;
+}
+
+
 int Animation::drawAnimation(sf::RenderWindow &window){
     //If this is the first time we're drawing, reset clock
     //So we are sure to draw the first frame

@@ -10,6 +10,8 @@
 #include <array>    //Safer, easier to use fixed size arrays to hold textures
 #include <ctime>    //time(NULL) for Rand Seed
 #include <cstdlib>  //Rand
+#include "../Bus/Bus.hpp"
+#include "../AudioManager/AudioManager.hpp"
 #include "../Background/Background.hpp"   //Moving, looping background
 #include "../Animation/Animation.hpp"    //Game object with looping animation
 #include "../Effect/Effect.hpp"       //Animation that plays once
@@ -20,6 +22,9 @@
 
 class Game{
     private:
+        Bus bus;
+        AudioManager audioManager;
+
         //Window
         sf::RenderWindow window;
         unsigned int screen_w;
@@ -62,9 +67,6 @@ class Game{
 
         sf::SoundBuffer enemyShotSoundBuf;
         sf::Sound enemyShotSound;
-
-        sf::SoundBuffer shipExplosionSoundBuf;
-        sf::Sound shipExplosionSound;
 
         //Text
         sf::Text scoreText;

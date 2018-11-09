@@ -1,13 +1,16 @@
 #pragma once
 
 #include <vector>
+#include <functional>
+#include "../Bus/BusSender.hpp"
 #include "../helperFunctions/helperFunctions.hpp"
 #include "../Animation/Animation.hpp"
 
 enum class ShipTypes{mosquito, eagle, dragon};
 
-class Player_Ship : public Animation{
+class Player_Ship : public Animation, public BusSender{
     private:
+        std::reference_wrapper<Bus> bus;
         float scaleMultiplier = 1;
         ShipTypes shipType;
         int destination = -1;
@@ -22,19 +25,18 @@ class Player_Ship : public Animation{
         void initEagle();
         void initDragon();
         void initShipType(ShipTypes type);
-
-    public:
         bool dead = false;
         int health = 20;
-        int damage = 1;
 
-        //Constructor without ship type
-        template<std::size_t SIZE>
-        Player_Ship(const std::array<sf::Texture, SIZE> &ship_textures, const sf::Texture &bullet_texture);
+    public:
+        int dmg = 1;
+        void damage(int dmg);
+        bool isDead(){return dead;}
+        void setHealth(int health);
 
         //Constructor with ship type
         template<std::size_t SIZE>
-        Player_Ship(ShipTypes type, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, const sf::Texture &bullet_texture);
+        Player_Ship(Bus& pBus, ShipTypes type, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, const sf::Texture &bullet_texture);
 
 
         template<std::size_t SIZE>
@@ -59,21 +61,12 @@ class Player_Ship : public Animation{
 
 
 
-
-//Constructor without ship type
-template<std::size_t SIZE>
-Player_Ship::Player_Ship(const std::array<sf::Texture, SIZE> &ship_textures, const sf::Texture &bullet_texture) 
-: Animation{ship_textures}{
-    //Animation Constructor + setting bullet textures
-    bulletSprite.setTexture(bullet_texture);
-}
-
-
 //Constructor with ship type
 template<std::size_t SIZE>
-Player_Ship::Player_Ship(ShipTypes type, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, 
+Player_Ship::Player_Ship(Bus& pBus, ShipTypes type, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, 
                          const sf::Texture &bullet_texture)
-: Animation{ship_textures}{
+: Animation{ship_textures}, bus{std::ref(pBus)}{
+
     //Animation Constructor + setting bullet textures
     bulletSprite.setTexture(bullet_texture);
 

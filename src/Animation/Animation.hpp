@@ -8,6 +8,7 @@
 class Animation{
     protected:
         bool firstDraw = true;
+        bool invisible = false;
 
         sf::Color flashColor = sf::Color::White;
         int flashMsDuration = 0;
@@ -48,6 +49,9 @@ class Animation{
 
         virtual void flipVertically();
         void flash(sf::Color flashColor, int flashMsDuration);
+
+        void toggleInvisibility();
+        bool isInvisible();
 };
 
 

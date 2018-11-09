@@ -6,75 +6,77 @@
 
 //Constructor
 Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync){
+    bus.addListener(audioManager);
+
     //Rand seed init
     srand(std::time(NULL));
 
     //Setting resolution
-    this->setRes(res);
+    setRes(res);
 
     //Loading High Scores
-    if(this->loadHighScores() == false)
-        this->highScores.fill(0);
+    if(loadHighScores() == false)
+        highScores.fill(0);
 
     //Setting difficulty
-    this->setDifficulty(dfculty);
+    setDifficulty(dfculty);
 
     //Text init
-    this->initText();
+    initText();
 
     //Textures init
     std::cout << "Loading textures..." << std::endl;
 
     //background texture
-    this->bgTexture.loadFromFile("../assets/textures/background.jpg");
+    bgTexture.loadFromFile("../assets/textures/background.jpg");
 
     //bullet textures
-    this->blueBulletTexture.loadFromFile("../assets/textures/blue/bullet.bmp");
-    this->redBulletTexture.loadFromFile("../assets/textures/red/bullet.bmp");
+    blueBulletTexture.loadFromFile("../assets/textures/blue/bullet.bmp");
+    redBulletTexture.loadFromFile("../assets/textures/red/bullet.bmp");
 
     //blue eagle textures
-    Helpers::loadTextures(this->blueEagleTextures, "../assets/textures/blue/eagle_$d.png");
+    Helpers::loadTextures(blueEagleTextures, "../assets/textures/blue/eagle_$d.png");
 
     //blue mosquito textures
-    Helpers::loadTextures(this->blueMosquitoTextures, "../assets/textures/blue/mosquito_$d.png");
+    Helpers::loadTextures(blueMosquitoTextures, "../assets/textures/blue/mosquito_$d.png");
 
     //blue dragon textures
-    Helpers::loadTextures(this->blueDragonTextures, "../assets/textures/blue/dragon_$d.png");
+    Helpers::loadTextures(blueDragonTextures, "../assets/textures/blue/dragon_$d.png");
 
     //player life texture
-    this->playerLife.loadFromFile("../assets/textures/blue/mothership.png");
+    playerLife.loadFromFile("../assets/textures/blue/mothership.png");
 
     //red mosquito textures
-    Helpers::loadTextures(this->redMosquitoTextures, "../assets/textures/red/mosquito_$d.png");
+    Helpers::loadTextures(redMosquitoTextures, "../assets/textures/red/mosquito_$d.png");
 
     //red eagle textures
-    Helpers::loadTextures(this->redEagleTextures, "../assets/textures/red/eagle_$d.png");
+    Helpers::loadTextures(redEagleTextures, "../assets/textures/red/eagle_$d.png");
 
     //red eagle textures
-    Helpers::loadTextures(this->redDragonTextures, "../assets/textures/red/dragon_$d.png");
+    Helpers::loadTextures(redDragonTextures, "../assets/textures/red/dragon_$d.png");
 
     //Red explosion textures
-    Helpers::loadTextures(this->redExplosionTextures, "../assets/textures/red/explosion_$d.png");
+    Helpers::loadTextures(redExplosionTextures, "../assets/textures/red/explosion_$d.png");
 
     //Blue explosion
-    Helpers::loadTextures(this->blueExplosionTextures, "../assets/textures/blue/explosion_$d.png");
+    Helpers::loadTextures(blueExplosionTextures, "../assets/textures/blue/explosion_$d.png");
 
 
     //Game Objects init
     std::cout << "Creating game objects..." << std::endl;
 
     //Background init
-    this->bg = std::unique_ptr<Background>(new Background{this->bgTexture, this->screen_w, this->screen_h});
+    bg = std::unique_ptr<Background>(new Background{bgTexture, screen_w, screen_h});
 
     //Player init
-    this->initPlayer();
+    initPlayer();
 
     //Life counter sprites init
-    this->initLifeIndicators();
+    initLifeIndicators();
 
     //Sound init
     std::cout << "Loading sounds..." << std::endl;
-    this->initSound();
+    initSound();
 
 
     //Window init
@@ -83,37 +85,37 @@ Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync){
     //Calculating coordinates for a centered window
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     sf::Vector2i windowPos;
-    windowPos.x = (desktop.width / 2) - (this->screen_w / 2);
-    windowPos.y = (desktop.height / 2) - (this->screen_h / 2);
+    windowPos.x = (desktop.width / 2) - (screen_w / 2);
+    windowPos.y = (desktop.height / 2) - (screen_h / 2);
 
     //Creating it
-    sf::VideoMode videomode{this->screen_w, this->screen_h};
-    this->window.create(videomode, "Bullet Hell", sf::Style::Titlebar | sf::Style::Close);
+    sf::VideoMode videomode{screen_w, screen_h};
+    window.create(videomode, "Bullet Hell", sf::Style::Titlebar | sf::Style::Close);
 
     //Centering it
-    this->window.setPosition(windowPos);
+    window.setPosition(windowPos);
 
     //fps limit
     if(vsync){
-        this->window.setVerticalSyncEnabled(true);
+        window.setVerticalSyncEnabled(true);
         std::cout << "Vsync enabled." << std::endl;
     }
     else{
-        this->window.setFramerateLimit(144);
+        window.setFramerateLimit(144);
         std::cout << "Framerate Limit: 144." << std::endl;
     }
 
     //Disabling repeated key events
-    this->window.setKeyRepeatEnabled(false);
+    window.setKeyRepeatEnabled(false);
 
     //Starting music
-    this->music.play();
+    music.play();
 
     std::cout << "Game ready." << std::endl;
 
     //Starting clocks
-    this->movementClock.restart();
-    this->playTimeClock.restart();
+    movementClock.restart();
+    playTimeClock.restart();
 
 }
 
@@ -124,14 +126,14 @@ void Game::handleInput(){
     sf::Event event;
 
     //Get all pending events
-    while(this->window.pollEvent(event)){
+    while(window.pollEvent(event)){
         
         //check the type of the event
         switch(event.type){
             //window closed
             case sf::Event::Closed:
             window.close();
-            this->running = false;
+            running = false;
             break;
 
             //key pressed
@@ -142,48 +144,48 @@ void Game::handleInput(){
                 case sf::Keyboard::Escape:
                 case sf::Keyboard::Q:
                 window.close();
-                this->running = false;
+                running = false;
                 break;
 
                 //R key - Restart if dead
                 case sf::Keyboard::R:
-                if(this->player->dead)
-                    this->restart();
+                if(player->isDead())
+                    restart();
                 break;
 
 
                 //When Shift is pressed, slow player down by 50%
                 case sf::Keyboard::LShift:
                 case sf::Keyboard::RShift:
-                this->playerSpeed /= 1.5;
+                playerSpeed /= 1.5;
                 break;
 
                 //Ship change 1
                 case sf::Keyboard::Num1:
                 case sf::Keyboard::Num8:
-                this->player->switchShipType(ShipTypes::eagle, this->blueEagleTextures);
+                player->switchShipType(ShipTypes::eagle, blueEagleTextures);
                 break;
 
                 //Ship change 2
                 case sf::Keyboard::Num2:
                 case sf::Keyboard::Num9:
-                this->player->switchShipType(ShipTypes::mosquito, this->blueMosquitoTextures);
+                player->switchShipType(ShipTypes::mosquito, blueMosquitoTextures);
                 break;
 
                 //Ship change 3
                 case sf::Keyboard::Num3:
                 case sf::Keyboard::Num0:
-                this->player->switchShipType(ShipTypes::dragon, this->blueDragonTextures);
+                player->switchShipType(ShipTypes::dragon, blueDragonTextures);
                 break;
 
                 //Fire
                 case sf::Keyboard::Space:
-                this->shoot = true;
+                shoot = true;
                 break;
 
                 //Fire toggle
                 case sf::Keyboard::G:
-                this->shootToogle = !this->shootToogle;
+                shootToogle = !shootToogle;
                 break;
 
                 //Start Movement
@@ -191,28 +193,28 @@ void Game::handleInput(){
                 case sf::Keyboard::W:
                 case sf::Keyboard::I:
                 case sf::Keyboard::Up:
-                this->moveUp = true;
+                moveUp = true;
                 break;
 
                 //Move Down
                 case sf::Keyboard::S:
                 case sf::Keyboard::K:
                 case sf::Keyboard::Down:
-                this->moveDown = true;
+                moveDown = true;
                 break;
 
                 //Move Left
                 case sf::Keyboard::A:
                 case sf::Keyboard::J:
                 case sf::Keyboard::Left:
-                this->moveLeft = true;
+                moveLeft = true;
                 break;
 
                 //Move Right
                 case sf::Keyboard::D:
                 case sf::Keyboard::L:
                 case sf::Keyboard::Right:
-                this->moveRight = true;
+                moveRight = true;
                 break;
 
                 default:
@@ -226,12 +228,12 @@ void Game::handleInput(){
                 //Restore player speed
                 case sf::Keyboard::LShift:
                 case sf::Keyboard::RShift:
-                    this->playerSpeed *= 1.5;
+                    playerSpeed *= 1.5;
                 break;
 
                 //Stop fire
                 case sf::Keyboard::Space:
-                this->shoot = false;
+                shoot = false;
                 break;
 
 
@@ -240,28 +242,28 @@ void Game::handleInput(){
                 case sf::Keyboard::W:
                 case sf::Keyboard::I:
                 case sf::Keyboard::Up:
-                this->moveUp = false;
+                moveUp = false;
                 break;
 
                 //Move Down
                 case sf::Keyboard::S:
                 case sf::Keyboard::K:
                 case sf::Keyboard::Down:
-                this->moveDown = false;
+                moveDown = false;
                 break;
 
                 //Move Left
                 case sf::Keyboard::A:
                 case sf::Keyboard::J:
                 case sf::Keyboard::Left:
-                this->moveLeft = false;
+                moveLeft = false;
                 break;
 
                 //Move Right
                 case sf::Keyboard::D:
                 case sf::Keyboard::L:
                 case sf::Keyboard::Right:
-                this->moveRight = false;
+                moveRight = false;
                 break;
 
                 default:
@@ -284,43 +286,43 @@ void Game::doMovement(){
     //This way, the speed of the game will be constant no matter the refresh rate.
     //Ex: if game runs at 120fps, a loop will take half as much time as it would with 60fps
     //    So we halve the speed of the objects
-    this->time = this->movementClock.restart().asMilliseconds();
+    time = movementClock.restart().asMilliseconds();
 
     //Background movement
-    this->bg->moveDown(this->bgSpeed * this->time);
+    bg->moveDown(bgSpeed * time);
 
     //Player movement based on input
-    this->playerMovement();
+    playerMovement();
 
     //Enemy AI movement
-    for(Player_Ship &enemy : this->enemies){
+    for(Player_Ship &enemy : enemies){
         float speed;
         ShipTypes enemyType = enemy.getShipType();
 
         switch(enemyType){
             case ShipTypes::mosquito:
             default:
-            speed = this->enemyMosquitoSpeed;
+            speed = enemyMosquitoSpeed;
             break;
 
             case ShipTypes::eagle:
-            speed = this->enemyEagleSpeed;
+            speed = enemyEagleSpeed;
             break;
 
             case ShipTypes::dragon:
-            speed = this->enemyDragonSpeed;
+            speed = enemyDragonSpeed;
             break;
         }
-        enemy.AI_MoveWithinBounds(this->screen_w, speed * this->time);
+        enemy.AI_MoveWithinBounds(screen_w, speed * time);
     }
 
     //Moving player bullets up
-    for(sf::Sprite &bullet : this->playerBullets)
-        bullet.move(0, 0 - this->playerBulletSpeed * this->time);
+    for(sf::Sprite &bullet : playerBullets)
+        bullet.move(0, 0 - playerBulletSpeed * time);
 
     //Moving enemy bullets down
-    for(sf::Sprite &bullet : this->enemyBullets)
-        bullet.move(0, this->enemyBulletSpeed * this->time);
+    for(sf::Sprite &bullet : enemyBullets)
+        bullet.move(0, enemyBulletSpeed * time);
 }
 
 
@@ -328,25 +330,25 @@ void Game::doMovement(){
 void Game::doActions(){
 
     //If player is alive, enable player and enemy shooting
-    if(player->dead == false){
+    if(player->isDead() == false){
         //Player shooting
-        if(this->shoot || this->shootToogle){
-            std::vector<sf::Sprite> shots = this->player->shoot();
+        if(shoot || shootToogle){
+            std::vector<sf::Sprite> shots = player->shoot();
 
             if(shots.size()){   //if bullets are shot
                 for(sf::Sprite &bullet : shots)
-                    this->playerBullets.push_back(bullet);
+                    playerBullets.push_back(bullet);
 
-                this->playerShotSound.play();
+                playerShotSound.play();
             }
         }
 
         //Enemy shooting
         int div = 100;
-        if(this->enemyChanceNotToShoot * this->time > 0)
-            div = this->enemyChanceNotToShoot * this->time;
+        if(enemyChanceNotToShoot * time > 0)
+            div = enemyChanceNotToShoot * time;
         
-        for(Player_Ship &enemy : this->enemies){
+        for(Player_Ship &enemy : enemies){
             //1% chance of shooting each frame if game is 60hz. 0.5% if 120hz etc.
             if(rand() % div == 0){
                 //At least 500ms will pass before next bullet is shot
@@ -354,10 +356,10 @@ void Game::doActions(){
 
                 if(shots.size()){   //If bullets are shot
                     for(sf::Sprite bullet : shots)
-                        this->enemyBullets.push_back(bullet);
+                        enemyBullets.push_back(bullet);
 
                     //Play enemy shooting sound
-                    this->enemyShotSound.play();
+                    enemyShotSound.play();
                 }
             }
         }
@@ -367,17 +369,17 @@ void Game::doActions(){
     //Bullet contact
     //Player bullets - enemy ships
     //For each bullet
-    for(auto i = this->playerBullets.begin(); i != this->playerBullets.end(); i++){
+    for(auto i = playerBullets.begin(); i != playerBullets.end(); i++){
         //For each enemy
-        for(Player_Ship &enemy : this->enemies){
+        for(Player_Ship &enemy : enemies){
             //If enemy is hit by bullet, decrease health and remove bullet
             if(enemy.isHitBy(*i)){
-                enemy.health -= this->player->damage;
+                enemy.damage(player->dmg);
                 enemy.flash(sf::Color{255, 255, 255, 127}, 20);   //turn the ship half transparent for 20ms
 
                 //get a valid iterator to the next element
                 //if we don't it might still work but it's undefined behavior
-                i = this->playerBullets.erase(i);
+                i = playerBullets.erase(i);
                 i--;    //This is so we don't skip a bullet
                 break;
             }
@@ -385,15 +387,15 @@ void Game::doActions(){
     }
 
     //Enemy bullets - player ship
-    if(this->player->dead == false){
-        for(auto i = this->enemyBullets.begin(); i != this->enemyBullets.end(); i++){
+    if(player->isDead() == false){
+        for(auto i = enemyBullets.begin(); i != enemyBullets.end(); i++){
 
             //First check if the rectangles intersect, then check if bullet hits one of the hitboxes
             if(player->isHitBy(*i)){
-                this->player->health--;
-                this->player->flash(sf::Color::Red, 35);    //flash player red for 30ms
-                i = this->enemyBullets.erase(i);
-                this->lives.pop_back();
+                player->damage(1);
+                player->flash(sf::Color::Red, 35);    //flash player red for 30ms
+                i = enemyBullets.erase(i);
+                lives.pop_back();
                 i--;
             }
         }
@@ -401,10 +403,12 @@ void Game::doActions(){
 
 
     //If current wave has been destroyed, increase enemy count and spawn a new wave
-    if(this->enemies.size() == 0){
-        this->enemyCount++;
-        this->spawnEnemies();
+    if(enemies.size() == 0){
+        enemyCount++;
+        spawnEnemies();
     }
+
+    bus.notifyListeners();
 }
 
 
@@ -413,65 +417,65 @@ void Game::doActions(){
 //placing an explosion effects in their place.
 void Game::destroyObjects(){
     //Removing out of screen player bullets
-    for(auto i = this->playerBullets.begin(); i != this->playerBullets.end(); i++){
-        if(this->outOfScreen(i->getGlobalBounds(), this->screen_w, this->screen_h)){
-            i = this->playerBullets.erase(i);
+    for(auto i = playerBullets.begin(); i != playerBullets.end(); i++){
+        if(outOfScreen(i->getGlobalBounds(), screen_w, screen_h)){
+            i = playerBullets.erase(i);
             i--;
         }
     }
 
     //Removing out of screen enemy bullets
-    for(auto i = this->enemyBullets.begin(); i != this->enemyBullets.end(); i++){
-        if(this->outOfScreen(i->getGlobalBounds(), this->screen_w, this->screen_h)){
-            i = this->enemyBullets.erase(i);
+    for(auto i = enemyBullets.begin(); i != enemyBullets.end(); i++){
+        if(outOfScreen(i->getGlobalBounds(), screen_w, screen_h)){
+            i = enemyBullets.erase(i);
             i--;
         }
     }
 
 
     //Destroying dead enemy ships
-    for(auto i = this->enemies.begin(); i != this->enemies.end(); i++){
-        if(i->health <= 0){
+    for(auto i = enemies.begin(); i != enemies.end(); i++){
+        if(i->isDead()){
             //setting explosion effect
             sf::Vector2f enemyPos = i->getPos();
 
-            enemyPos.x -= 20 * (this->screen_w / 1024);
-            this->explosions.push_back(Effect{this->redExplosionTextures});
-            this->explosions.back().setPos(enemyPos.x, enemyPos.y);
-            this->explosions.back().setMsBetweenFrames(20);
-            this->explosions.back().play();
+            enemyPos.x -= 20 * (screen_w / 1024);
+            explosions.push_back(Effect{redExplosionTextures});
+            explosions.back().setPos(enemyPos.x, enemyPos.y);
+            explosions.back().setMsBetweenFrames(20);
+            explosions.back().play();
 
             //removing ship object from vector
-            i = this->enemies.erase(i);
+            i = enemies.erase(i);
 
             //playing explosion audio
-            this->shipExplosionSound.play();
+            //shipExplosionSound.play();
             i--;
 
             //incrementing player score
-            this->score++;
+            score++;
         }
     }
 
 
     //Exploding player ship if health <= 0
     //This will disable player input and enemy shooting, and update score text + draw it
-    if(this->player->health <= 0 && this->player->dead == false){
-        sf::Vector2f playerPos = this->player->getPos();
-        this->player->dead = true;
+    if(player->isDead() && player->isInvisible() == false){
+        sf::Vector2f playerPos = player->getPos();
+        player->toggleInvisibility();
 
         //placing explosion effect
-        playerPos.x -= 20 * (this->screen_w / 1024);
-        this->explosions.push_back(Effect{this->blueExplosionTextures});
-        this->explosions.back().setPos(playerPos.x, playerPos.y);
-        this->explosions.back().setMsBetweenFrames(1000 / 60);
-        this->explosions.back().play();
+        playerPos.x -= 20 * (screen_w / 1024);
+        explosions.push_back(Effect{blueExplosionTextures});
+        explosions.back().setPos(playerPos.x, playerPos.y);
+        explosions.back().setMsBetweenFrames(1000 / 60);
+        explosions.back().play();
 
         //playing explosion audio
-        this->shipExplosionSound.play();
+        //shipExplosionSound.play();
 
         //Update score text and highscore
-        this->updateScoreText();
+        updateScoreText();
     }
 }
 
@@ -479,49 +483,49 @@ void Game::destroyObjects(){
 
 void Game::render(){
     //Clear the window
-    this->window.clear();
+    window.clear();
 
     //Draw background
-    this->bg->draw(this->window);
+    bg->draw(window);
 
     //Draw player bullets
-    for(sf::Sprite bullet : this->playerBullets)
-        this->window.draw(bullet);
+    for(sf::Sprite bullet : playerBullets)
+        window.draw(bullet);
 
     //Draw enemy bullets
-    for(sf::Sprite bullet : this->enemyBullets)
-        this->window.draw(bullet);
+    for(sf::Sprite bullet : enemyBullets)
+        window.draw(bullet);
 
     //Draw player if alive
-    if(this->player->dead == false)
-        this->player->drawAnimation(this->window);
+    if(player->isDead() == false)
+        player->drawAnimation(window);
 
     //Draw enemies
-    for(Player_Ship &enemy : this->enemies)
-        enemy.drawAnimation(this->window);
+    for(Player_Ship &enemy : enemies)
+        enemy.drawAnimation(window);
 
     //Draw explosion effects
-    for(Effect &explosion : this->explosions)
-        explosion.drawNext(this->window);
+    for(Effect &explosion : explosions)
+        explosion.drawNext(window);
 
     //Draw lives left
-    for(sf::Sprite life : this->lives)
-        this->window.draw(life);
+    for(sf::Sprite life : lives)
+        window.draw(life);
 
     //If player is dead, draw text on top of everything else
-    if(this->player->dead){
+    if(player->isDead()){
         window.draw(composerName);
-        this->window.draw(this->restartText);
-        this->window.draw(this->scoreText);
-        this->window.draw(this->timeText);
-        this->window.draw(this->highScoreText);
-        this->window.draw(this->authorName);
-        this->window.draw(this->authorSurname);
-        this->window.draw(this->difficultyText);
+        window.draw(restartText);
+        window.draw(scoreText);
+        window.draw(timeText);
+        window.draw(highScoreText);
+        window.draw(authorName);
+        window.draw(authorSurname);
+        window.draw(difficultyText);
     }
 
     //Display everything we've drawn
-    this->window.display();
+    window.display();
 }
 
 
@@ -542,7 +546,7 @@ bool Game::loadHighScores(){
     }
 
     //Try loading each score from the file
-    for(auto i = this->highScores.begin(); i != this->highScores.end(); i++){
+    for(auto i = highScores.begin(); i != highScores.end(); i++){
         scoresFile.read(reinterpret_cast<char*>(&buf), sizeof(buf));
 
         if(scoresFile.good())
@@ -560,12 +564,12 @@ bool Game::loadHighScores(){
 
 
 void Game::setDifficulty(Difficulty::Level diff){
-    this->difficulty = diff;
+    difficulty = diff;
     std::cout << "Difficulty set to ";
 
     switch(difficulty){
         case Difficulty::Level::easy:
-        this->enemyChanceNotToShoot *= 2;
+        enemyChanceNotToShoot *= 2;
         std::cout << "Easy.";
         break;
 
@@ -574,7 +578,7 @@ void Game::setDifficulty(Difficulty::Level diff){
         break;
 
         case Difficulty::Level::hard:
-        this->enemyChanceNotToShoot /= 2;
+        enemyChanceNotToShoot /= 2;
         std::cout << "Hard.";
         break;
     }
@@ -584,66 +588,61 @@ void Game::setDifficulty(Difficulty::Level diff){
 
 void Game::setRes(Resolution::Setting res){
     //Setting resolution
-    Resolution::setIntFromResolution(res, this->screen_h, this->screen_w);
+    Resolution::setIntFromResolution(res, screen_h, screen_w);
 
     //Scaling objects and their speed based on screen resolution
-    float factor = this->screen_w / 800.0;
+    float factor = screen_w / 800.0;
 
-    this->playerSpeed *= factor;
-    this->enemyMosquitoSpeed *= factor;
-    this->enemyEagleSpeed *= factor;
-    this->enemyDragonSpeed *= factor;
-    this->playerBulletSpeed *= factor;
-    this->enemyBulletSpeed *= factor;
-    this->lifeScale *= factor;
-    this->textScale *= factor;
+    playerSpeed *= factor;
+    enemyMosquitoSpeed *= factor;
+    enemyEagleSpeed *= factor;
+    enemyDragonSpeed *= factor;
+    playerBulletSpeed *= factor;
+    enemyBulletSpeed *= factor;
+    lifeScale *= factor;
+    textScale *= factor;
 }
 
 
 void Game::initSound(){
     //Music
-    this->music.openFromFile("../assets/audio/8-Bit-Mayhem.ogg");
-    this->music.setVolume(50);
-    this->music.setLoop(true);
+    music.openFromFile("../assets/audio/8-Bit-Mayhem.ogg");
+    music.setVolume(50);
+    music.setLoop(true);
 
     //Player laser shot sound
-    this->playerShotSoundBuf.loadFromFile("../assets/audio/laser_shot1.wav");
-    this->playerShotSound.setBuffer(this->playerShotSoundBuf);
-    this->playerShotSound.setVolume(10);
+    playerShotSoundBuf.loadFromFile("../assets/audio/laser_shot1.wav");
+    playerShotSound.setBuffer(playerShotSoundBuf);
+    playerShotSound.setVolume(10);
 
     //Enemy laser shot sound
-    this->enemyShotSoundBuf.loadFromFile("../assets/audio/laser_shot2.wav");
-    this->enemyShotSound.setBuffer(this->enemyShotSoundBuf);
-    this->enemyShotSound.setVolume(15);
-
-    //Ship explosion sound
-    this->shipExplosionSoundBuf.loadFromFile("../assets/audio/explosion1.wav");
-    this->shipExplosionSound.setBuffer(this->shipExplosionSoundBuf);
-    this->shipExplosionSound.setVolume(20);
+    enemyShotSoundBuf.loadFromFile("../assets/audio/laser_shot2.wav");
+    enemyShotSound.setBuffer(enemyShotSoundBuf);
+    enemyShotSound.setVolume(15);
 }
 
 
 void Game::initPlayer(){
     //Constructor with ship and bullet textures
-    this->player = std::unique_ptr<Player_Ship>
-    (new Player_Ship(ShipTypes::eagle, (float)this->screen_w / 800,this->blueEagleTextures, this->blueBulletTexture));
+    player = std::unique_ptr<Player_Ship>
+    (new Player_Ship(bus, ShipTypes::eagle, (float)screen_w / 800,blueEagleTextures, blueBulletTexture));
 
     //Setting position
-    sf::FloatRect playerRect = this->player->getRect();
-    this->player->setPos((this->screen_w / 2) - (playerRect.width / 2), this->screen_h - playerRect.height);
+    sf::FloatRect playerRect = player->getRect();
+    player->setPos((screen_w / 2) - (playerRect.width / 2), screen_h - playerRect.height);
 
     //Setting health
-    this->player->health = this->maxPlayerHealth;
+    player->setHealth(maxPlayerHealth);
 }
 
 
 void Game::saveNewHighscore(){
     //Set the high score for current difficulty to current score
-    this->highScores[static_cast<int>(this->difficulty)] = this->score;
+    highScores[static_cast<int>(difficulty)] = score;
 
     //Update the high scores file
     std::ofstream scoreOutput{"highscore.bin", std::ofstream::out | std::ofstream::binary | std::ofstream::trunc};
-    for(int score : this->highScores){
+    for(int score : highScores){
         scoreOutput.write(reinterpret_cast<const char*>(&score), sizeof(score));
     }
 }
@@ -651,141 +650,144 @@ void Game::saveNewHighscore(){
 
 
 void Game::updateScoreText(){
-    int highScore = this->highScores[static_cast<int>(this->difficulty)];
+    int highScore = highScores[static_cast<int>(difficulty)];
 
     //Set playtime text
-    sf::Time playTime = this->playTimeClock.getElapsedTime();
+    sf::Time playTime = playTimeClock.getElapsedTime();
     std::string timeStr = "TIME: " + Helpers::minutesAndSeconds(playTime);
-    this->timeText.setString(timeStr);
+    timeText.setString(timeStr);
 
     //Setting score text
     std::ostringstream text;
-    text << "SCORE: " << this->score;
-    this->scoreText.setString(text.str());
+    text << "SCORE: " << score;
+    scoreText.setString(text.str());
 
     //Setting high score text
     std::ostringstream highText;
-    if(highScore < this->score){
+    if(highScore < score){
         highText << "NEW HIGH SCORE!";
-        this->saveNewHighscore();
+        saveNewHighscore();
     }
     else highText << "HIGH SCORE: " << highScore;
-    this->highScoreText.setString(highText.str());
+    highScoreText.setString(highText.str());
 
 
     //Centering score text
-    sf::FloatRect textRect = this->scoreText.getGlobalBounds();
-    int x = (this->screen_w / 2) - (textRect.width / 2);
-    int y = (this->screen_h / 2) - (textRect.height / 2);
-    this->scoreText.setPosition(x, y);
+    sf::FloatRect textRect = scoreText.getGlobalBounds();
+    int x = (screen_w / 2) - (textRect.width / 2);
+    int y = (screen_h / 2) - (textRect.height / 2);
+    scoreText.setPosition(x, y);
 
     //Centering playtime text just below score text
-    sf::FloatRect timeRect = this->timeText.getGlobalBounds();
-    x = (this->screen_w / 2) - (timeRect.width / 2);
+    sf::FloatRect timeRect = timeText.getGlobalBounds();
+    x = (screen_w / 2) - (timeRect.width / 2);
     y += textRect.height * 1.3; //* 1.3 is so the time text isn't too close to the text above
-    this->timeText.setPosition(x, y);
+    timeText.setPosition(x, y);
 
     //Placing high score text x = centered, y = (maxY - maxY / 4)
-    sf::FloatRect highScoreRect = this->highScoreText.getGlobalBounds();
-    x = (this->screen_w / 2) - (highScoreRect.width / 2);
-    y = this->screen_h - this->screen_h / 3;
-    this->highScoreText.setPosition(x, y);
+    sf::FloatRect highScoreRect = highScoreText.getGlobalBounds();
+    x = (screen_w / 2) - (highScoreRect.width / 2);
+    y = screen_h - screen_h / 3;
+    highScoreText.setPosition(x, y);
 
     //Placing difficulty text just below high score text
-    sf::FloatRect difficultyRect = this->difficultyText.getGlobalBounds();
-    x = (this->screen_w / 2) - (difficultyRect.width / 2);
+    sf::FloatRect difficultyRect = difficultyText.getGlobalBounds();
+    x = (screen_w / 2) - (difficultyRect.width / 2);
     y += highScoreRect.height * 1.3;
-    this->difficultyText.setPosition(x, y);
+    difficultyText.setPosition(x, y);
 }
 
 
 void Game::initLifeIndicators(){
     //Add as many life indicators as the player's starting health
-    for(int i = 0; i < this->maxPlayerHealth; i++){
-        this->lives.push_back(sf::Sprite{});
-        this->lives.back().setTexture(this->playerLife);
-        this->lives.back().setScale(this->lifeScale, this->lifeScale);
+    for(int i = 0; i < maxPlayerHealth; i++){
+        lives.push_back(sf::Sprite{});
+        lives.back().setTexture(playerLife);
+        lives.back().setScale(lifeScale, lifeScale);
 
-        int x = this->lives.back().getGlobalBounds().width * i;
-        int y = this->screen_h - this->lives.back().getGlobalBounds().height;
-        this->lives.back().setPosition(x, y);
+        int x = lives.back().getGlobalBounds().width * i;
+        int y = screen_h - lives.back().getGlobalBounds().height;
+        lives.back().setPosition(x, y);
     }
 }
 
 
 void Game::restart(){
     //Resetting Player
-    sf::FloatRect playerRect = this->player->getRect();
-    this->player->dead = false;
-    this->player->health = this->maxPlayerHealth;
-    this->player->setPos((this->screen_w / 2) - (playerRect.width / 2), this->screen_h - playerRect.height);
+    sf::FloatRect playerRect = player->getRect();
+
+    if(player->isInvisible())
+        player->toggleInvisibility();
+
+    player->setHealth(maxPlayerHealth);
+    player->setPos((screen_w / 2) - (playerRect.width / 2), screen_h - playerRect.height);
 
     //Resetting Life sprites
-    this->initLifeIndicators();
+    initLifeIndicators();
 
     //Clearing all game object vectors
-    this->enemies.clear();
-    this->playerBullets.clear();
-    this->enemyBullets.clear();
+    enemies.clear();
+    playerBullets.clear();
+    enemyBullets.clear();
 
     //Resetting enemy count, which will spawn first wave
-    this->enemyCount = 0;
+    enemyCount = 0;
 
     //Resetting score
-    this->score = 0;
+    score = 0;
 
     //Resetting playtime clock
-    this->playTimeClock.restart();
+    playTimeClock.restart();
 }
 
 
 void Game::initText(){
     //Loading Font
-    this->font.loadFromFile("../assets/font/SourceSansPro-Regular.ttf");
+    font.loadFromFile("../assets/font/SourceSansPro-Regular.ttf");
 
     //Init Score Text
-    this->scoreText.setFont(this->font);
-    this->scoreText.setCharacterSize((int)(32 * this->textScale));
-    this->scoreText.setFillColor(sf::Color::Red);
-    this->scoreText.setStyle(sf::Text::Bold);
+    scoreText.setFont(font);
+    scoreText.setCharacterSize((int)(32 * textScale));
+    scoreText.setFillColor(sf::Color::Red);
+    scoreText.setStyle(sf::Text::Bold);
 
     //Init Highscore Text
-    this->highScoreText.setFont(this->font);
-    this->highScoreText.setCharacterSize((int)(12 * this->textScale));
-    this->highScoreText.setFillColor(sf::Color::Red);
-    this->highScoreText.setStyle(sf::Text::Bold);
+    highScoreText.setFont(font);
+    highScoreText.setCharacterSize((int)(12 * textScale));
+    highScoreText.setFillColor(sf::Color::Red);
+    highScoreText.setStyle(sf::Text::Bold);
 
     //Init Time Text
-    this->timeText.setFont(this->font);
-    this->timeText.setCharacterSize((int)(12 * this->textScale));
-    this->timeText.setFillColor(sf::Color::Red);
-    this->timeText.setStyle(sf::Text::Bold);
+    timeText.setFont(font);
+    timeText.setCharacterSize((int)(12 * textScale));
+    timeText.setFillColor(sf::Color::Red);
+    timeText.setStyle(sf::Text::Bold);
 
     //Init Restart Text
-    this->restartText.setString("PRESS R TO RESTART!");
-    this->restartText.setFont(this->font);
-    this->restartText.setCharacterSize((int)(16 * this->textScale));
-    this->restartText.setFillColor(sf::Color::Red);
-    this->restartText.setStyle(sf::Text::Bold);
+    restartText.setString("PRESS R TO RESTART!");
+    restartText.setFont(font);
+    restartText.setCharacterSize((int)(16 * textScale));
+    restartText.setFillColor(sf::Color::Red);
+    restartText.setStyle(sf::Text::Bold);
 
     //Init Difficulty Text
-    this->difficultyText.setString("DIFFICULTY: " + Helpers::allUpperCase(Difficulty::difficultyToStr(this->difficulty)));
-    this->difficultyText.setFont(this->font);
-    this->difficultyText.setCharacterSize((int)(12 * this->textScale));
-    this->difficultyText.setFillColor(sf::Color::Red);
-    this->difficultyText.setStyle(sf::Text::Bold);
+    difficultyText.setString("DIFFICULTY: " + Helpers::allUpperCase(Difficulty::difficultyToStr(difficulty)));
+    difficultyText.setFont(font);
+    difficultyText.setCharacterSize((int)(12 * textScale));
+    difficultyText.setFillColor(sf::Color::Red);
+    difficultyText.setStyle(sf::Text::Bold);
 
     //Init Name and Surname Text
-    this->authorName.setString("DANIELE");
-    this->authorSurname.setString("PUSCEDDU");
-    this->authorName.setFont(this->font);
-    this->authorSurname.setFont(this->font);
-    this->authorName.setCharacterSize((int)(10 * this->textScale));
-    this->authorSurname.setCharacterSize((int)(10 * this->textScale));
-    this->authorName.setFillColor(sf::Color::Red);
-    this->authorSurname.setFillColor(sf::Color::Red);
-    this->authorName.setStyle(sf::Text::Bold);
-    this->authorSurname.setStyle(sf::Text::Bold);
+    authorName.setString("DANIELE");
+    authorSurname.setString("PUSCEDDU");
+    authorName.setFont(font);
+    authorSurname.setFont(font);
+    authorName.setCharacterSize((int)(10 * textScale));
+    authorSurname.setCharacterSize((int)(10 * textScale));
+    authorName.setFillColor(sf::Color::Red);
+    authorSurname.setFillColor(sf::Color::Red);
+    authorName.setStyle(sf::Text::Bold);
+    authorSurname.setStyle(sf::Text::Bold);
 
     //Init Composer Text
     composerName.setString("MUSIC BY ERIC MATYAS - www.soundimage.org");
@@ -795,59 +797,56 @@ void Game::initText(){
     composerName.setPosition(0, 0);
 
     //Centering X of Restart Text and placing it under composer credits
-    sf::FloatRect textRect = this->restartText.getGlobalBounds();
-    int x = (this->screen_w / 2) - (textRect.width / 2);
-    this->restartText.setPosition(x, composerName.getGlobalBounds().height * 1.2f);
+    sf::FloatRect textRect = restartText.getGlobalBounds();
+    int x = (screen_w / 2) - (textRect.width / 2);
+    restartText.setPosition(x, composerName.getGlobalBounds().height * 1.2f);
 
     //Setting position of name text
-    textRect = this->authorName.getGlobalBounds();
-    this->authorName.setPosition(10, this->screen_h - textRect.height - 10);
+    textRect = authorName.getGlobalBounds();
+    authorName.setPosition(10, screen_h - textRect.height - 10);
 
     //Setting position of surname text
-    textRect = this->authorSurname.getGlobalBounds();
-    this->authorSurname.setPosition(this->screen_w - textRect.width - 10, this->screen_h - textRect.height - 10);
+    textRect = authorSurname.getGlobalBounds();
+    authorSurname.setPosition(screen_w - textRect.width - 10, screen_h - textRect.height - 10);
 }
 
 
 void Game::spawnEnemies(){
     // Spawn as many enemies as enemyCount
-    for(int i = 0; i < this->enemyCount; i++){
+    for(int i = 0; i < enemyCount; i++){
         int randNum = rand() % 100;
 
         //70% chance for the enemy to be a mosquito
-        if(randNum < 70){
-            this->enemies.push_back(
-                Player_Ship{ShipTypes::mosquito, (float)this->screen_w / 800, this->redMosquitoTextures, this->redBulletTexture}
+        if(randNum < 70)
+            enemies.push_back(
+                Player_Ship{bus, ShipTypes::mosquito, (float)screen_w / 800, redMosquitoTextures, redBulletTexture}
             );
-            this->enemies.back().health = 15;
-        }
+        
 
         //20% chance for the enemy to be an eagle
-        else if(randNum < 90){
-            this->enemies.push_back(
-                Player_Ship{ShipTypes::eagle, (float)this->screen_w / 800, this->redEagleTextures, this->redBulletTexture}
+        else if(randNum < 90)
+            enemies.push_back(
+                Player_Ship{bus, ShipTypes::eagle, (float)screen_w / 800, redEagleTextures, redBulletTexture}
             );
-            this->enemies.back().health = 20;
-        }
+        
 
         //10% chance for the enemy to be a dragon
-        else{
-            this->enemies.push_back(
-                Player_Ship{ShipTypes::dragon, (float)this->screen_w / 800, this->redDragonTextures, this->redBulletTexture}
+        else
+            enemies.push_back(
+                Player_Ship{bus, ShipTypes::dragon, (float)screen_w / 800, redDragonTextures, redBulletTexture}
             );
-            this->enemies.back().health = 30;
-        }
+        
 
         //Set position
-        int y = (rand() % 2) * this->enemies.back().getRect().height;
-        int x = rand() % (int)(this->screen_w - this->enemies.back().getRect().width);
-        this->enemies.back().setPos(x, y);
+        int y = (rand() % 2) * enemies.back().getRect().height;
+        int x = rand() % (int)(screen_w - enemies.back().getRect().width);
+        enemies.back().setPos(x, y);
 
         //Flip Vertically so enemy faces the player
-        this->enemies.back().flipVertically();
+        enemies.back().flipVertically();
 
         //Setting shooting cooldown, overriding the ship type's cooldown
-        this->enemies.back().setMsBetweenShots(500);
+        enemies.back().setMsBetweenShots(500);
     }
 }
 
@@ -868,18 +867,18 @@ bool Game::outOfScreen(sf::FloatRect rect, int w, int h){
 
 void Game::playerMovement(){
     //Move left if key is pressed
-    if(this->moveLeft)
-        this->player->moveLeft(playerSpeed * this->time, 0);
+    if(moveLeft)
+        player->moveLeft(playerSpeed * time, 0);
 
     //Move right if key is pressed
-    if(this->moveRight)
-        this->player->moveRight(playerSpeed * this->time, this->screen_w);
+    if(moveRight)
+        player->moveRight(playerSpeed * time, screen_w);
 
     //Move up if key is pressed
-    if(this->moveUp)
-        this->player->moveUp(playerSpeed * this->time, 0);
+    if(moveUp)
+        player->moveUp(playerSpeed * time, 0);
 
     //Move down if key is pressed
-    if(this->moveDown)
-        this->player->moveDown(playerSpeed * this->time, this->screen_h);
+    if(moveDown)
+        player->moveDown(playerSpeed * time, screen_h);
 }

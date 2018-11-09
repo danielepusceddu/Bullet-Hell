@@ -16,6 +16,10 @@ set(SOURCE_FILES src/bulletHell.cpp
                  src/Game/Game.cpp
                  src/Resolution/Resolution.cpp
                  src/Difficulty/Difficulty.cpp
+                 src/Bus/Bus.cpp
+                 src/Bus/BusNode.cpp
+                 src/Bus/Message.cpp
+                 src/AudioManager/AudioManager.cpp
                  extlibs/Collision/Collision.cpp)
 
 add_executable(bulletHell ${SOURCE_FILES})
