@@ -42,6 +42,10 @@ std::vector<sf::Sprite> Player_Ship::shoot(){
 
         //Update time of last shot
         lastShot = elapsed.asMilliseconds();
+
+        //Send Shot Event
+        Message::Type type = (_team == Player_Ship::Team::blue) ? Message::Type::BLUE_SHIP_SHOT : Message::Type::RED_SHIP_SHOT;
+        bus.get().sendMessage(Message{type, *this});
     }
 
     //Return vector of bullets

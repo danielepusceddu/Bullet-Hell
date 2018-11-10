@@ -9,26 +9,8 @@
 enum class ShipTypes{mosquito, eagle, dragon};
 
 class Player_Ship : public Animation, public BusSender{
-    private:
-        std::reference_wrapper<Bus> bus;
-        float scaleMultiplier = 1;
-        ShipTypes shipType;
-        int destination = -1;
-        bool destGreaterThanX;
-
-        sf::Sprite bulletSprite;
-        sf::Int32 lastShot = -1000;
-        int msBetweenShots = 1;
-        std::vector<sf::Vector2f> shootingPoints;
-
-        void initMosquito();
-        void initEagle();
-        void initDragon();
-        void initShipType(ShipTypes type);
-        bool dead = false;
-        int health = 20;
-
     public:
+        enum class Team{blue, red};
         int dmg = 1;
         void damage(int dmg);
         bool isDead(){return dead;}
@@ -36,7 +18,7 @@ class Player_Ship : public Animation, public BusSender{
 
         //Constructor with ship type
         template<std::size_t SIZE>
-        Player_Ship(Bus& pBus, ShipTypes type, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, const sf::Texture &bullet_texture);
+        Player_Ship(Bus& pBus, ShipTypes type, Team team, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, const sf::Texture &bullet_texture);
 
 
         template<std::size_t SIZE>
@@ -57,15 +39,36 @@ class Player_Ship : public Animation, public BusSender{
         void flipVertically() override;
         void setScale(float scale_x, float scale_y) override;
         virtual ~Player_Ship(){}
+
+
+        private:
+        Team _team;
+        std::reference_wrapper<Bus> bus;
+        float scaleMultiplier = 1;
+        ShipTypes shipType;
+        int destination = -1;
+        bool destGreaterThanX;
+
+        sf::Sprite bulletSprite;
+        sf::Int32 lastShot = -1000;
+        int msBetweenShots = 1;
+        std::vector<sf::Vector2f> shootingPoints;
+
+        void initMosquito();
+        void initEagle();
+        void initDragon();
+        void initShipType(ShipTypes type);
+        bool dead = false;
+        int health = 20;
 };
 
 
 
 //Constructor with ship type
 template<std::size_t SIZE>
-Player_Ship::Player_Ship(Bus& pBus, ShipTypes type, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, 
+Player_Ship::Player_Ship(Bus& pBus, ShipTypes type, Team team, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, 
                          const sf::Texture &bullet_texture)
-: Animation{ship_textures}, bus{std::ref(pBus)}{
+: Animation{ship_textures}, _team{team}, bus{std::ref(pBus)}{
 
     //Animation Constructor + setting bullet textures
     bulletSprite.setTexture(bullet_texture);

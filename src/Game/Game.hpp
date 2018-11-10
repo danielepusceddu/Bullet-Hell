@@ -62,12 +62,6 @@ class Game{
         //Sounds
         sf::Music music;
 
-        sf::SoundBuffer playerShotSoundBuf;
-        sf::Sound playerShotSound;
-
-        sf::SoundBuffer enemyShotSoundBuf;
-        sf::Sound enemyShotSound;
-
         //Text
         sf::Text scoreText;
         sf::Text highScoreText;

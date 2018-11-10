@@ -11,4 +11,10 @@ class AudioManager : public BusNode{
     private:
     sf::SoundBuffer shipExplosionSoundBuf;
     sf::Sound shipExplosionSound;
+
+    sf::SoundBuffer blueShotSoundBuf;
+    sf::Sound blueShotSound;
+
+    sf::SoundBuffer redShotSoundBuf;
+    sf::Sound redShotSound;
 };

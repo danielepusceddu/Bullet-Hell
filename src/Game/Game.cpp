@@ -335,12 +335,10 @@ void Game::doActions(){
         if(shoot || shootToogle){
             std::vector<sf::Sprite> shots = player->shoot();
 
-            if(shots.size()){   //if bullets are shot
+            if(shots.size())  //if bullets are shot
                 for(sf::Sprite &bullet : shots)
                     playerBullets.push_back(bullet);
-
-                playerShotSound.play();
-            }
+            
         }
 
         //Enemy shooting
@@ -354,13 +352,9 @@ void Game::doActions(){
                 //At least 500ms will pass before next bullet is shot
                 std::vector<sf::Sprite> shots = enemy.shoot();
 
-                if(shots.size()){   //If bullets are shot
+                if(shots.size())   //If bullets are shot
                     for(sf::Sprite bullet : shots)
                         enemyBullets.push_back(bullet);
-
-                    //Play enemy shooting sound
-                    enemyShotSound.play();
-                }
             }
         }
     }
@@ -447,9 +441,6 @@ void Game::destroyObjects(){
 
             //removing ship object from vector
             i = enemies.erase(i);
-
-            //playing explosion audio
-            //shipExplosionSound.play();
             i--;
 
             //incrementing player score
@@ -470,9 +461,6 @@ void Game::destroyObjects(){
         explosions.back().setPos(playerPos.x, playerPos.y);
         explosions.back().setMsBetweenFrames(1000 / 60);
         explosions.back().play();
-
-        //playing explosion audio
-        //shipExplosionSound.play();
 
         //Update score text and highscore
         updateScoreText();
@@ -609,23 +597,13 @@ void Game::initSound(){
     music.openFromFile("../assets/audio/8-Bit-Mayhem.ogg");
     music.setVolume(50);
     music.setLoop(true);
-
-    //Player laser shot sound
-    playerShotSoundBuf.loadFromFile("../assets/audio/laser_shot1.wav");
-    playerShotSound.setBuffer(playerShotSoundBuf);
-    playerShotSound.setVolume(10);
-
-    //Enemy laser shot sound
-    enemyShotSoundBuf.loadFromFile("../assets/audio/laser_shot2.wav");
-    enemyShotSound.setBuffer(enemyShotSoundBuf);
-    enemyShotSound.setVolume(15);
 }
 
 
 void Game::initPlayer(){
     //Constructor with ship and bullet textures
     player = std::unique_ptr<Player_Ship>
-    (new Player_Ship(bus, ShipTypes::eagle, (float)screen_w / 800,blueEagleTextures, blueBulletTexture));
+    (new Player_Ship(bus, ShipTypes::eagle, Player_Ship::Team::blue, (float)screen_w / 800,blueEagleTextures, blueBulletTexture));
 
     //Setting position
     sf::FloatRect playerRect = player->getRect();
@@ -819,21 +797,21 @@ void Game::spawnEnemies(){
         //70% chance for the enemy to be a mosquito
         if(randNum < 70)
             enemies.push_back(
-                Player_Ship{bus, ShipTypes::mosquito, (float)screen_w / 800, redMosquitoTextures, redBulletTexture}
+                Player_Ship{bus, ShipTypes::mosquito, Player_Ship::Team::red, (float)screen_w / 800, redMosquitoTextures, redBulletTexture}
             );
         
 
         //20% chance for the enemy to be an eagle
         else if(randNum < 90)
             enemies.push_back(
-                Player_Ship{bus, ShipTypes::eagle, (float)screen_w / 800, redEagleTextures, redBulletTexture}
+                Player_Ship{bus, ShipTypes::eagle, Player_Ship::Team::red, (float)screen_w / 800, redEagleTextures, redBulletTexture}
             );
         
 
         //10% chance for the enemy to be a dragon
         else
             enemies.push_back(
-                Player_Ship{bus, ShipTypes::dragon, (float)screen_w / 800, redDragonTextures, redBulletTexture}
+                Player_Ship{bus, ShipTypes::dragon, Player_Ship::Team::red, (float)screen_w / 800, redDragonTextures, redBulletTexture}
             );
         
 

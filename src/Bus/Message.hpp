@@ -3,7 +3,7 @@
 class BusSender;
 class Message{
     public:
-    enum class Type{SHIP_SHOT, SHIP_DEATH};
+    enum class Type{BLUE_SHIP_SHOT, RED_SHIP_SHOT, SHIP_DEATH};
     Message(Type messageType, BusSender& messageCreator);
     Message(const Message& msg);
     Type getType() const;
