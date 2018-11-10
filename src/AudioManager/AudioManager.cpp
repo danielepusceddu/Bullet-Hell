@@ -1,6 +1,9 @@
 #include "AudioManager.hpp"
+#include <iostream>
 
 AudioManager::AudioManager(){
+    std::cout << "Loading sounds..." << std::endl;
+
     //Ship explosion sound
     shipExplosionSoundBuf.loadFromFile("../assets/audio/explosion1.wav");
     shipExplosionSound.setBuffer(shipExplosionSoundBuf);
@@ -15,9 +18,16 @@ AudioManager::AudioManager(){
     redShotSoundBuf.loadFromFile("../assets/audio/laser_shot2.wav");
     redShotSound.setBuffer(redShotSoundBuf);
     redShotSound.setVolume(15);
+
+    //Music
+    music.openFromFile("../assets/audio/8-Bit-Mayhem.ogg");
+    music.setVolume(50);
+    music.setLoop(true);
 }
 
-AudioManager::~AudioManager(){}
+void AudioManager::startMusic(){
+    music.play();
+}
 
 void AudioManager::notify(Message msg){
     switch(msg.getType()){

@@ -5,10 +5,12 @@
 class AudioManager : public BusNode{
     public:
     AudioManager();
-    ~AudioManager();
     void notify(Message msg) override;
+    void startMusic();
 
     private:
+    sf::Music music;
+
     sf::SoundBuffer shipExplosionSoundBuf;
     sf::Sound shipExplosionSound;
 

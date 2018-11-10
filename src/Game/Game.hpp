@@ -22,6 +22,7 @@
 
 class Game{
     private:
+        //Bus and Bus Nodes
         Bus bus;
         AudioManager audioManager;
 
@@ -58,9 +59,6 @@ class Game{
 
         std::array<sf::Texture, 13> redExplosionTextures;
         std::array<sf::Texture, 13> blueExplosionTextures;
-
-        //Sounds
-        sf::Music music;
 
         //Text
         sf::Text scoreText;

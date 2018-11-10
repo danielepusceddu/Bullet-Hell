@@ -74,11 +74,6 @@ Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync){
     //Life counter sprites init
     initLifeIndicators();
 
-    //Sound init
-    std::cout << "Loading sounds..." << std::endl;
-    initSound();
-
-
     //Window init
     std::cout << "Opening window..." << std::endl;
 
@@ -109,7 +104,7 @@ Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync){
     window.setKeyRepeatEnabled(false);
 
     //Starting music
-    music.play();
+    audioManager.startMusic();
 
     std::cout << "Game ready." << std::endl;
 
@@ -589,14 +584,6 @@ void Game::setRes(Resolution::Setting res){
     enemyBulletSpeed *= factor;
     lifeScale *= factor;
     textScale *= factor;
-}
-
-
-void Game::initSound(){
-    //Music
-    music.openFromFile("../assets/audio/8-Bit-Mayhem.ogg");
-    music.setVolume(50);
-    music.setLoop(true);
 }
 
 
