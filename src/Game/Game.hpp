@@ -21,6 +21,10 @@
 #include "../Difficulty/Difficulty.hpp" //Namespace for difficulty enum and related helper functions
 
 class Game{
+        public:
+        Game(Resolution::Setting res, Difficulty::Level difficulty, bool vsync);
+        void run();
+
     private:
         //Bus and Bus Nodes
         Bus bus;
@@ -33,8 +37,8 @@ class Game{
 
         //System
         sf::Clock playTimeClock;
-        sf::Clock movementClock;
-        sf::Int32 time;
+        sf::Time timePerFrame = sf::seconds(1.0 / 60.0);
+        float delta = timePerFrame.asSeconds();
 
         //Game
         std::array<int, 3> highScores;  //high scores for each difficulty
@@ -96,13 +100,13 @@ class Game{
 
         //constants
         int maxPlayerHealth = 5;
-        float playerSpeed = 7 * 0.065;
-        float enemyMosquitoSpeed = 3.5 * 0.065;
-        float enemyEagleSpeed = 2.5 * 0.065;
-        float enemyDragonSpeed = 1.5 * 0.065;
-        float playerBulletSpeed = 10 * 0.065;
-        float enemyBulletSpeed = 4 * 0.065;
-        float bgSpeed = 20 * 0.065;
+        float playerSpeed = 420;
+        float enemyMosquitoSpeed = 210;
+        float enemyEagleSpeed = 150;
+        float enemyDragonSpeed = 90;
+        float playerBulletSpeed = 600;
+        float enemyBulletSpeed = 240;
+        float bgSpeed = 1200;
         float enemyChanceNotToShoot = 100 * 0.065;
 
         //Private methods
@@ -120,13 +124,10 @@ class Game{
         void setDifficulty(Difficulty::Level diff);
         bool outOfScreen(sf::FloatRect rect, int w, int h);
 
-    public:
-        //Public methods
-        Game(Resolution::Setting res, Difficulty::Level difficulty, bool vsync);
+        //Loop Methods
         void handleInput();
         void doMovement();
         void doActions();
         void destroyObjects();
         void render();
-        bool isRunning(){return this->running;}
 };

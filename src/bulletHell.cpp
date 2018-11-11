@@ -21,17 +21,11 @@ int main(int argc, char **argv){
     //Command line options override the config file
     parseArgs(argc, argv, gameRes, vsync, difficulty);
 
-   
-    //Game init
+   //Game init
     Game game{gameRes, difficulty, vsync};
+
     //Game loop
-    while(game.isRunning()){
-        game.handleInput();
-        game.doMovement();
-        game.doActions();
-        game.destroyObjects();
-        game.render();
-    }
+    game.run();
 
     return 0;
 }

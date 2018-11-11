@@ -1,278 +1,31 @@
 #include "Game.hpp"
 
-//****************
-//*PUBLIC METHODS*
-//****************
+//*******************
+//*GAME LOOP METHODS*
+//*******************
 
-//Constructor
-Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync){
-    bus.addListener(audioManager);
+void Game::run(){
+    sf::Clock clock;
+    sf::Time timeSinceLastUpdate = sf::Time::Zero;
 
-    //Rand seed init
-    srand(std::time(NULL));
-
-    //Setting resolution
-    setRes(res);
-
-    //Loading High Scores
-    if(loadHighScores() == false)
-        highScores.fill(0);
-
-    //Setting difficulty
-    setDifficulty(dfculty);
-
-    //Text init
-    initText();
-
-    //Textures init
-    std::cout << "Loading textures..." << std::endl;
-
-    //background texture
-    bgTexture.loadFromFile("../assets/textures/background.jpg");
-
-    //bullet textures
-    blueBulletTexture.loadFromFile("../assets/textures/blue/bullet.bmp");
-    redBulletTexture.loadFromFile("../assets/textures/red/bullet.bmp");
-
-    //blue eagle textures
-    Helpers::loadTextures(blueEagleTextures, "../assets/textures/blue/eagle_$d.png");
-
-    //blue mosquito textures
-    Helpers::loadTextures(blueMosquitoTextures, "../assets/textures/blue/mosquito_$d.png");
-
-    //blue dragon textures
-    Helpers::loadTextures(blueDragonTextures, "../assets/textures/blue/dragon_$d.png");
-
-    //player life texture
-    playerLife.loadFromFile("../assets/textures/blue/mothership.png");
-
-    //red mosquito textures
-    Helpers::loadTextures(redMosquitoTextures, "../assets/textures/red/mosquito_$d.png");
-
-    //red eagle textures
-    Helpers::loadTextures(redEagleTextures, "../assets/textures/red/eagle_$d.png");
-
-    //red eagle textures
-    Helpers::loadTextures(redDragonTextures, "../assets/textures/red/dragon_$d.png");
-
-    //Red explosion textures
-    Helpers::loadTextures(redExplosionTextures, "../assets/textures/red/explosion_$d.png");
-
-    //Blue explosion
-    Helpers::loadTextures(blueExplosionTextures, "../assets/textures/blue/explosion_$d.png");
-
-
-    //Game Objects init
-    std::cout << "Creating game objects..." << std::endl;
-
-    //Background init
-    bg = std::unique_ptr<Background>(new Background{bgTexture, screen_w, screen_h});
-
-    //Player init
-    initPlayer();
-
-    //Life counter sprites init
-    initLifeIndicators();
-
-    //Window init
-    std::cout << "Opening window..." << std::endl;
-
-    //Calculating coordinates for a centered window
-    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    sf::Vector2i windowPos;
-    windowPos.x = (desktop.width / 2) - (screen_w / 2);
-    windowPos.y = (desktop.height / 2) - (screen_h / 2);
-
-    //Creating it
-    sf::VideoMode videomode{screen_w, screen_h};
-    window.create(videomode, "Bullet Hell", sf::Style::Titlebar | sf::Style::Close);
-
-    //Centering it
-    window.setPosition(windowPos);
-
-    //fps limit
-    if(vsync){
-        window.setVerticalSyncEnabled(true);
-        std::cout << "Vsync enabled." << std::endl;
-    }
-    else{
-        window.setFramerateLimit(144);
-        std::cout << "Framerate Limit: 144." << std::endl;
-    }
-
-    //Disabling repeated key events
-    window.setKeyRepeatEnabled(false);
-
-    //Starting music
-    audioManager.startMusic();
-
-    std::cout << "Game ready." << std::endl;
-
-    //Starting clocks
-    movementClock.restart();
     playTimeClock.restart();
+    while(running){
+        handleInput();
 
+        timeSinceLastUpdate += clock.getElapsedTime();
+        clock.restart();
+
+        while(timeSinceLastUpdate >= timePerFrame){
+            doMovement();
+            doActions();
+            destroyObjects();
+
+            timeSinceLastUpdate -= timePerFrame;
+        }
+
+        render();
+    }
 }
-
-
-
-//Handling events
-void Game::handleInput(){
-    sf::Event event;
-
-    //Get all pending events
-    while(window.pollEvent(event)){
-        
-        //check the type of the event
-        switch(event.type){
-            //window closed
-            case sf::Event::Closed:
-            window.close();
-            running = false;
-            break;
-
-            //key pressed
-            case sf::Event::KeyPressed:
-            switch(event.key.code){
-
-                //escape key || q key - Close game
-                case sf::Keyboard::Escape:
-                case sf::Keyboard::Q:
-                window.close();
-                running = false;
-                break;
-
-                //R key - Restart if dead
-                case sf::Keyboard::R:
-                if(player->isDead())
-                    restart();
-                break;
-
-
-                //When Shift is pressed, slow player down by 50%
-                case sf::Keyboard::LShift:
-                case sf::Keyboard::RShift:
-                playerSpeed /= 1.5;
-                break;
-
-                //Ship change 1
-                case sf::Keyboard::Num1:
-                case sf::Keyboard::Num8:
-                player->switchShipType(ShipTypes::eagle, blueEagleTextures);
-                break;
-
-                //Ship change 2
-                case sf::Keyboard::Num2:
-                case sf::Keyboard::Num9:
-                player->switchShipType(ShipTypes::mosquito, blueMosquitoTextures);
-                break;
-
-                //Ship change 3
-                case sf::Keyboard::Num3:
-                case sf::Keyboard::Num0:
-                player->switchShipType(ShipTypes::dragon, blueDragonTextures);
-                break;
-
-                //Fire
-                case sf::Keyboard::Space:
-                shoot = true;
-                break;
-
-                //Fire toggle
-                case sf::Keyboard::G:
-                shootToogle = !shootToogle;
-                break;
-
-                //Start Movement
-                //Move Up
-                case sf::Keyboard::W:
-                case sf::Keyboard::I:
-                case sf::Keyboard::Up:
-                moveUp = true;
-                break;
-
-                //Move Down
-                case sf::Keyboard::S:
-                case sf::Keyboard::K:
-                case sf::Keyboard::Down:
-                moveDown = true;
-                break;
-
-                //Move Left
-                case sf::Keyboard::A:
-                case sf::Keyboard::J:
-                case sf::Keyboard::Left:
-                moveLeft = true;
-                break;
-
-                //Move Right
-                case sf::Keyboard::D:
-                case sf::Keyboard::L:
-                case sf::Keyboard::Right:
-                moveRight = true;
-                break;
-
-                default:
-                break;
-            }   //end key code switch
-            break;  //end key pressed case
-
-            //Key released
-            case sf::Event::KeyReleased:
-            switch(event.key.code){
-                //Restore player speed
-                case sf::Keyboard::LShift:
-                case sf::Keyboard::RShift:
-                    playerSpeed *= 1.5;
-                break;
-
-                //Stop fire
-                case sf::Keyboard::Space:
-                shoot = false;
-                break;
-
-
-                //Stop Movement
-                //Move Up
-                case sf::Keyboard::W:
-                case sf::Keyboard::I:
-                case sf::Keyboard::Up:
-                moveUp = false;
-                break;
-
-                //Move Down
-                case sf::Keyboard::S:
-                case sf::Keyboard::K:
-                case sf::Keyboard::Down:
-                moveDown = false;
-                break;
-
-                //Move Left
-                case sf::Keyboard::A:
-                case sf::Keyboard::J:
-                case sf::Keyboard::Left:
-                moveLeft = false;
-                break;
-
-                //Move Right
-                case sf::Keyboard::D:
-                case sf::Keyboard::L:
-                case sf::Keyboard::Right:
-                moveRight = false;
-                break;
-
-                default:
-                break;
-            }   //end key released switch
-            break;
-
-            default:
-            break;
-        }   //end event type switch
-
-    }  //end while pending events
-}   //end handleInput
-
 
 
 //Moving game objects
@@ -281,10 +34,9 @@ void Game::doMovement(){
     //This way, the speed of the game will be constant no matter the refresh rate.
     //Ex: if game runs at 120fps, a loop will take half as much time as it would with 60fps
     //    So we halve the speed of the objects
-    time = movementClock.restart().asMilliseconds();
 
     //Background movement
-    bg->moveDown(bgSpeed * time);
+    bg->moveDown(bgSpeed * delta);
 
     //Player movement based on input
     playerMovement();
@@ -308,17 +60,19 @@ void Game::doMovement(){
             speed = enemyDragonSpeed;
             break;
         }
-        enemy.AI_MoveWithinBounds(screen_w, speed * time);
+        enemy.AI_MoveWithinBounds(screen_w, speed * delta);
     }
 
     //Moving player bullets up
     for(sf::Sprite &bullet : playerBullets)
-        bullet.move(0, 0 - playerBulletSpeed * time);
+        bullet.move(0, 0 - playerBulletSpeed * delta);
+    
 
     //Moving enemy bullets down
     for(sf::Sprite &bullet : enemyBullets)
-        bullet.move(0, enemyBulletSpeed * time);
+        bullet.move(0, enemyBulletSpeed * delta);
 }
+
 
 
 //Shooting and damage
@@ -337,13 +91,10 @@ void Game::doActions(){
         }
 
         //Enemy shooting
-        int div = 100;
-        if(enemyChanceNotToShoot * time > 0)
-            div = enemyChanceNotToShoot * time;
         
         for(Player_Ship &enemy : enemies){
-            //1% chance of shooting each frame if game is 60hz. 0.5% if 120hz etc.
-            if(rand() % div == 0){
+            //1% chance of shooting each frame
+            if(rand() % 100 == 0){
                 //At least 500ms will pass before next bullet is shot
                 std::vector<sf::Sprite> shots = enemy.shoot();
 
@@ -513,9 +264,276 @@ void Game::render(){
 
 
 
-//*****************
-//*PRIVATE METHODS*
-//*****************
+//Handling events
+void Game::handleInput(){
+    sf::Event event;
+
+    //Get all pending events
+    while(window.pollEvent(event)){
+        
+        //check the type of the event
+        switch(event.type){
+            //window closed
+            case sf::Event::Closed:
+            window.close();
+            running = false;
+            break;
+
+            //key pressed
+            case sf::Event::KeyPressed:
+            switch(event.key.code){
+
+                //escape key || q key - Close game
+                case sf::Keyboard::Escape:
+                case sf::Keyboard::Q:
+                window.close();
+                running = false;
+                break;
+
+                //R key - Restart if dead
+                case sf::Keyboard::R:
+                if(player->isDead())
+                    restart();
+                break;
+
+
+                //When Shift is pressed, slow player down by 50%
+                case sf::Keyboard::LShift:
+                case sf::Keyboard::RShift:
+                playerSpeed /= 1.5;
+                break;
+
+                //Ship change 1
+                case sf::Keyboard::Num1:
+                case sf::Keyboard::Num8:
+                player->switchShipType(ShipTypes::eagle, blueEagleTextures);
+                break;
+
+                //Ship change 2
+                case sf::Keyboard::Num2:
+                case sf::Keyboard::Num9:
+                player->switchShipType(ShipTypes::mosquito, blueMosquitoTextures);
+                break;
+
+                //Ship change 3
+                case sf::Keyboard::Num3:
+                case sf::Keyboard::Num0:
+                player->switchShipType(ShipTypes::dragon, blueDragonTextures);
+                break;
+
+                //Fire
+                case sf::Keyboard::Space:
+                shoot = true;
+                break;
+
+                //Fire toggle
+                case sf::Keyboard::G:
+                shootToogle = !shootToogle;
+                break;
+
+                //Start Movement
+                //Move Up
+                case sf::Keyboard::W:
+                case sf::Keyboard::I:
+                case sf::Keyboard::Up:
+                moveUp = true;
+                break;
+
+                //Move Down
+                case sf::Keyboard::S:
+                case sf::Keyboard::K:
+                case sf::Keyboard::Down:
+                moveDown = true;
+                break;
+
+                //Move Left
+                case sf::Keyboard::A:
+                case sf::Keyboard::J:
+                case sf::Keyboard::Left:
+                moveLeft = true;
+                break;
+
+                //Move Right
+                case sf::Keyboard::D:
+                case sf::Keyboard::L:
+                case sf::Keyboard::Right:
+                moveRight = true;
+                break;
+
+                default:
+                break;
+            }   //end key code switch
+            break;  //end key pressed case
+
+            //Key released
+            case sf::Event::KeyReleased:
+            switch(event.key.code){
+                //Restore player speed
+                case sf::Keyboard::LShift:
+                case sf::Keyboard::RShift:
+                    playerSpeed *= 1.5;
+                break;
+
+                //Stop fire
+                case sf::Keyboard::Space:
+                shoot = false;
+                break;
+
+
+                //Stop Movement
+                //Move Up
+                case sf::Keyboard::W:
+                case sf::Keyboard::I:
+                case sf::Keyboard::Up:
+                moveUp = false;
+                break;
+
+                //Move Down
+                case sf::Keyboard::S:
+                case sf::Keyboard::K:
+                case sf::Keyboard::Down:
+                moveDown = false;
+                break;
+
+                //Move Left
+                case sf::Keyboard::A:
+                case sf::Keyboard::J:
+                case sf::Keyboard::Left:
+                moveLeft = false;
+                break;
+
+                //Move Right
+                case sf::Keyboard::D:
+                case sf::Keyboard::L:
+                case sf::Keyboard::Right:
+                moveRight = false;
+                break;
+
+                default:
+                break;
+            }   //end key released switch
+            break;
+
+            default:
+            break;
+        }   //end event type switch
+
+    }  //end while pending events
+}   //end handleInput
+
+
+/////////////
+//CONSTRUCTOR
+/////////////
+Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync){
+    bus.addListener(audioManager);
+
+    //Rand seed init
+    srand(std::time(NULL));
+
+    //Setting resolution
+    setRes(res);
+
+    //Loading High Scores
+    if(loadHighScores() == false)
+        highScores.fill(0);
+
+    //Setting difficulty
+    setDifficulty(dfculty);
+
+    //Text init
+    initText();
+
+    //Textures init
+    std::cout << "Loading textures..." << std::endl;
+
+    //background texture
+    bgTexture.loadFromFile("../assets/textures/background.jpg");
+
+    //bullet textures
+    blueBulletTexture.loadFromFile("../assets/textures/blue/bullet.bmp");
+    redBulletTexture.loadFromFile("../assets/textures/red/bullet.bmp");
+
+    //blue eagle textures
+    Helpers::loadTextures(blueEagleTextures, "../assets/textures/blue/eagle_$d.png");
+
+    //blue mosquito textures
+    Helpers::loadTextures(blueMosquitoTextures, "../assets/textures/blue/mosquito_$d.png");
+
+    //blue dragon textures
+    Helpers::loadTextures(blueDragonTextures, "../assets/textures/blue/dragon_$d.png");
+
+    //player life texture
+    playerLife.loadFromFile("../assets/textures/blue/mothership.png");
+
+    //red mosquito textures
+    Helpers::loadTextures(redMosquitoTextures, "../assets/textures/red/mosquito_$d.png");
+
+    //red eagle textures
+    Helpers::loadTextures(redEagleTextures, "../assets/textures/red/eagle_$d.png");
+
+    //red eagle textures
+    Helpers::loadTextures(redDragonTextures, "../assets/textures/red/dragon_$d.png");
+
+    //Red explosion textures
+    Helpers::loadTextures(redExplosionTextures, "../assets/textures/red/explosion_$d.png");
+
+    //Blue explosion
+    Helpers::loadTextures(blueExplosionTextures, "../assets/textures/blue/explosion_$d.png");
+
+
+    //Game Objects init
+    std::cout << "Creating game objects..." << std::endl;
+
+    //Background init
+    bg = std::unique_ptr<Background>(new Background{bgTexture, screen_w, screen_h});
+
+    //Player init
+    initPlayer();
+
+    //Life counter sprites init
+    initLifeIndicators();
+
+    //Window init
+    std::cout << "Opening window..." << std::endl;
+
+    //Calculating coordinates for a centered window
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    sf::Vector2i windowPos;
+    windowPos.x = (desktop.width / 2) - (screen_w / 2);
+    windowPos.y = (desktop.height / 2) - (screen_h / 2);
+
+    //Creating it
+    sf::VideoMode videomode{screen_w, screen_h};
+    window.create(videomode, "Bullet Hell", sf::Style::Titlebar | sf::Style::Close);
+
+    //Centering it
+    window.setPosition(windowPos);
+
+    //fps limit
+    if(vsync){
+        window.setVerticalSyncEnabled(true);
+        std::cout << "Vsync enabled." << std::endl;
+    }
+    else{
+        window.setFramerateLimit(144);
+        std::cout << "Framerate Limit: 144." << std::endl;
+    }
+
+    //Disabling repeated key events
+    window.setKeyRepeatEnabled(false);
+
+    //Starting music
+    audioManager.startMusic();
+
+    std::cout << "Game ready." << std::endl;
+}
+
+
+
+//***********************
+//*OTHER PRIVATE METHODS*
+//***********************
 
 
 bool Game::loadHighScores(){
@@ -833,17 +851,17 @@ bool Game::outOfScreen(sf::FloatRect rect, int w, int h){
 void Game::playerMovement(){
     //Move left if key is pressed
     if(moveLeft)
-        player->moveLeft(playerSpeed * time, 0);
+        player->moveLeft(playerSpeed * delta, 0);
 
     //Move right if key is pressed
     if(moveRight)
-        player->moveRight(playerSpeed * time, screen_w);
+        player->moveRight(playerSpeed * delta, screen_w);
 
     //Move up if key is pressed
     if(moveUp)
-        player->moveUp(playerSpeed * time, 0);
+        player->moveUp(playerSpeed * delta, 0);
 
     //Move down if key is pressed
     if(moveDown)
-        player->moveDown(playerSpeed * time, screen_h);
+        player->moveDown(playerSpeed * delta, screen_h);
 }
