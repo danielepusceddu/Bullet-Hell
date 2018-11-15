@@ -4,7 +4,7 @@
 
 class AudioManager : public BusNode{
     public:
-    AudioManager();
+    AudioManager(Bus& bus);
     void notify(Message msg) override;
     void startMusic();
 

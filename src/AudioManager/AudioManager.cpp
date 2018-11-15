@@ -1,7 +1,9 @@
 #include "AudioManager.hpp"
 #include <iostream>
 
-AudioManager::AudioManager(){
+AudioManager::AudioManager(Bus& bus):
+BusNode{bus}
+{
     std::cout << "Loading sounds..." << std::endl;
 
     //Ship explosion sound

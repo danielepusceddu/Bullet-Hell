@@ -425,8 +425,9 @@ void Game::handleInput(){
 /////////////
 //CONSTRUCTOR
 /////////////
-Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync){
-    bus.addListener(audioManager);
+Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync):
+audioManager{bus}
+{
 
     //Rand seed init
     srand(std::time(NULL));

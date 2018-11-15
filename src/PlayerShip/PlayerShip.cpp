@@ -17,7 +17,7 @@ void Player_Ship::damage(int dmg){
 
         if(health <= 0){
             dead = true;
-            bus.get().sendMessage(Message{Message::Type::SHIP_DEATH, *this});
+            sendMessage(Message{Message::Type::SHIP_DEATH, *this});
         }
     }
 }
@@ -45,7 +45,7 @@ std::vector<sf::Sprite> Player_Ship::shoot(){
 
         //Send Shot Event
         Message::Type type = (_team == Player_Ship::Team::blue) ? Message::Type::BLUE_SHIP_SHOT : Message::Type::RED_SHIP_SHOT;
-        bus.get().sendMessage(Message{type, *this});
+        sendMessage(Message{type, *this});
     }
 
     //Return vector of bullets

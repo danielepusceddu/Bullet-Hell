@@ -1,7 +1,7 @@
 #include "Message.hpp"
 
 //Constructor
-Message::Message(Type messageType, BusSender& messageCreator)
+Message::Message(Type messageType, BusWriter& messageCreator)
     : type{messageType}, creator{messageCreator}
     {
 }
@@ -18,6 +18,6 @@ Message::Type Message::getType() const {
     return type;
 }
 
-BusSender& Message::getCreator() const {
+BusWriter& Message::getCreator() const {
     return creator;
 }

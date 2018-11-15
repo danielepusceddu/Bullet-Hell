@@ -1,15 +1,15 @@
 #pragma once
 
-class BusSender;
+class BusWriter;
 class Message{
     public:
     enum class Type{BLUE_SHIP_SHOT, RED_SHIP_SHOT, SHIP_DEATH};
-    Message(Type messageType, BusSender& messageCreator);
+    Message(Type messageType, BusWriter& messageCreator);
     Message(const Message& msg);
     Type getType() const;
-    BusSender& getCreator() const;
+    BusWriter& getCreator() const;
 
     private:
     Type type;
-    BusSender& creator;
+    BusWriter& creator;
 };

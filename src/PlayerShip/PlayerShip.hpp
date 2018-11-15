@@ -2,13 +2,14 @@
 
 #include <vector>
 #include <functional>
-#include "../Bus/BusSender.hpp"
+#include "../Bus/Message.hpp"
+#include "../Bus/BusWriter.hpp"
 #include "../helperFunctions/helperFunctions.hpp"
 #include "../Animation/Animation.hpp"
 
 enum class ShipTypes{mosquito, eagle, dragon};
 
-class Player_Ship : public Animation, public BusSender{
+class Player_Ship : public Animation, public BusWriter{
     public:
         enum class Team{blue, red};
         int dmg = 1;
@@ -43,7 +44,6 @@ class Player_Ship : public Animation, public BusSender{
 
         private:
         Team _team;
-        std::reference_wrapper<Bus> bus;
         float scaleMultiplier = 1;
         ShipTypes shipType;
         int destination = -1;
@@ -68,7 +68,7 @@ class Player_Ship : public Animation, public BusSender{
 template<std::size_t SIZE>
 Player_Ship::Player_Ship(Bus& pBus, ShipTypes type, Team team, float scaleMultiplier, const std::array<sf::Texture, SIZE> &ship_textures, 
                          const sf::Texture &bullet_texture)
-: Animation{ship_textures}, _team{team}, bus{std::ref(pBus)}{
+: Animation{ship_textures}, BusWriter{pBus}, _team{team}{
 
     //Animation Constructor + setting bullet textures
     bulletSprite.setTexture(bullet_texture);

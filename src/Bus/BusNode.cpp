@@ -1,4 +1,12 @@
 #include "BusNode.hpp"
+#include "Bus.hpp"
 
-BusNode::BusNode(){}
-BusNode::~BusNode(){}
+BusNode::BusNode(Bus& bus):
+busRef{std::ref(bus)}
+{
+    bus.addListener(*this);
+}
+
+BusNode::~BusNode(){
+    busRef.get().removeListener(*this);
+}
