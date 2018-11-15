@@ -3,11 +3,11 @@
 #include <functional>
 
 class Bus;
-class BusNode{
+class BusListener{
     public:
-    BusNode(Bus& bus);
+    BusListener(Bus& bus);
     virtual void notify(Message msg) = 0;
-    virtual ~BusNode();
+    virtual ~BusListener();
 
     private:
     std::reference_wrapper<Bus> busRef;

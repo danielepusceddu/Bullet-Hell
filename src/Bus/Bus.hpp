@@ -1,5 +1,5 @@
 #pragma once
-#include "BusNode.hpp"
+#include "BusListener.hpp"
 #include "Message.hpp"
 #include <functional>
 #include <vector>
@@ -10,11 +10,11 @@ class Bus{
 
     //If listener is not already in the listener list, add it and return true
     //Else return false
-    bool addListener(BusNode &listener);
+    bool addListener(BusListener &listener);
 
     //If listener is in the listener list, remove it and return true
     //Else return false
-    bool removeListener(const BusNode &listener);
+    bool removeListener(const BusListener &listener);
 
     //Add a Message to the bus
     void sendMessage(Message msg);
@@ -24,7 +24,7 @@ class Bus{
 
     private:
     std::queue<Message> messages;
-    std::vector<std::reference_wrapper<BusNode>> listeners;
-    bool isInListeners(const BusNode& node);
-    std::vector<std::reference_wrapper<BusNode>>::const_iterator findListener(const BusNode& node);
+    std::vector<std::reference_wrapper<BusListener>> listeners;
+    bool isInListeners(const BusListener& node);
+    std::vector<std::reference_wrapper<BusListener>>::const_iterator findListener(const BusListener& node);
 };

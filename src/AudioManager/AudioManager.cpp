@@ -2,7 +2,7 @@
 #include <iostream>
 
 AudioManager::AudioManager(Bus& bus):
-BusNode{bus}
+BusListener{bus}
 {
     std::cout << "Loading sounds..." << std::endl;
 

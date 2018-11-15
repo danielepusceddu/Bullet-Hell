@@ -1,8 +1,8 @@
 #pragma once
 #include <SFML/Audio.hpp>
-#include "../Bus/BusNode.hpp"
+#include "../Bus/BusListener.hpp"
 
-class AudioManager : public BusNode{
+class AudioManager : public BusListener{
     public:
     AudioManager(Bus& bus);
     void notify(Message msg) override;

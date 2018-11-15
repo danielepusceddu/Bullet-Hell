@@ -17,7 +17,7 @@ set(SOURCE_FILES src/bulletHell.cpp
                  src/Resolution/Resolution.cpp
                  src/Difficulty/Difficulty.cpp
                  src/Bus/Bus.cpp
-                 src/Bus/BusNode.cpp
+                 src/Bus/BusListener.cpp
                  src/Bus/BusWriter.cpp
                  src/Bus/Message.cpp
                  src/AudioManager/AudioManager.cpp

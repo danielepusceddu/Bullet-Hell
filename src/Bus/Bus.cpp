@@ -1,7 +1,7 @@
 #include "Bus.hpp"
 #include <algorithm>
 
-bool Bus::addListener(BusNode &listener){
+bool Bus::addListener(BusListener &listener){
     bool isNewListener = !isInListeners(listener);
 
     if(isNewListener)
@@ -11,7 +11,7 @@ bool Bus::addListener(BusNode &listener){
 }
 
 
-bool Bus::removeListener(const BusNode &listener){
+bool Bus::removeListener(const BusListener &listener){
     bool found;
     auto position = findListener(listener);
 
@@ -49,13 +49,13 @@ void Bus::notifyListeners(){
 //PRIVATE METHODS
 /////////////////
 
-bool Bus::isInListeners(const BusNode &node){
+bool Bus::isInListeners(const BusListener &node){
     auto position = findListener(node);
     return position != listeners.cend();
 }
 
-std::vector<std::reference_wrapper<BusNode>>::const_iterator Bus::findListener(const BusNode& node){
+std::vector<std::reference_wrapper<BusListener>>::const_iterator Bus::findListener(const BusListener& node){
     auto iterator = std::find_if(listeners.cbegin(), listeners.cend(), 
-                    [&](std::reference_wrapper<BusNode> node2){return &node == &(node2.get());});
+                    [&](std::reference_wrapper<BusListener> node2){return &node == &(node2.get());});
     return iterator;
 }
