@@ -42,26 +42,8 @@ void Game::doMovement(){
     playerMovement();
 
     //Enemy AI movement
-    for(Player_Ship &enemy : enemies){
-        float speed;
-        ShipTypes enemyType = enemy.getShipType();
-
-        switch(enemyType){
-            case ShipTypes::mosquito:
-            default:
-            speed = enemyMosquitoSpeed;
-            break;
-
-            case ShipTypes::eagle:
-            speed = enemyEagleSpeed;
-            break;
-
-            case ShipTypes::dragon:
-            speed = enemyDragonSpeed;
-            break;
-        }
-        enemy.AI_MoveWithinBounds(screen_w, speed * delta);
-    }
+    for(AI_Ship& enemy : enemies)
+        enemy.update(timePerFrame.asSeconds());
 
     //Moving player bullets up
     for(sf::Sprite &bullet : playerBullets)
@@ -88,41 +70,6 @@ void Game::doActions(){
                 for(sf::Sprite &bullet : shots)
                     playerBullets.push_back(bullet);
             
-        }
-
-        //Enemy shooting
-        
-        for(Player_Ship &enemy : enemies){
-            //1% chance of shooting each frame
-            if(rand() % 100 == 0){
-                //At least 500ms will pass before next bullet is shot
-                std::vector<sf::Sprite> shots = enemy.shoot();
-
-                if(shots.size())   //If bullets are shot
-                    for(sf::Sprite bullet : shots)
-                        enemyBullets.push_back(bullet);
-            }
-        }
-    }
-
-
-    //Bullet contact
-    //Player bullets - enemy ships
-    //For each bullet
-    for(auto i = playerBullets.begin(); i != playerBullets.end(); i++){
-        //For each enemy
-        for(Player_Ship &enemy : enemies){
-            //If enemy is hit by bullet, decrease health and remove bullet
-            if(enemy.isHitBy(*i)){
-                enemy.damage(player->dmg);
-                enemy.flash(sf::Color{255, 255, 255, 127}, 20);   //turn the ship half transparent for 20ms
-
-                //get a valid iterator to the next element
-                //if we don't it might still work but it's undefined behavior
-                i = playerBullets.erase(i);
-                i--;    //This is so we don't skip a bullet
-                break;
-            }
         }
     }
 
@@ -173,28 +120,6 @@ void Game::destroyObjects(){
     }
 
 
-    //Destroying dead enemy ships
-    for(auto i = enemies.begin(); i != enemies.end(); i++){
-        if(i->isDead()){
-            //setting explosion effect
-            sf::Vector2f enemyPos = i->getPos();
-
-            enemyPos.x -= 20 * (screen_w / 1024);
-            explosions.push_back(Effect{redExplosionTextures});
-            explosions.back().setPos(enemyPos.x, enemyPos.y);
-            explosions.back().setMsBetweenFrames(20);
-            explosions.back().play();
-
-            //removing ship object from vector
-            i = enemies.erase(i);
-            i--;
-
-            //incrementing player score
-            score++;
-        }
-    }
-
-
     //Exploding player ship if health <= 0
     //This will disable player input and enemy shooting, and update score text + draw it
     if(player->isDead() && player->isInvisible() == false){
@@ -235,8 +160,8 @@ void Game::render(){
         player->drawAnimation(window);
 
     //Draw enemies
-    for(Player_Ship &enemy : enemies)
-        enemy.drawAnimation(window);
+    for(AI_Ship &enemy : enemies)
+        enemy.draw(window);
 
     //Draw explosion effects
     for(Effect &explosion : explosions)
@@ -467,15 +392,6 @@ audioManager{bus}
     //player life texture
     playerLife.loadFromFile("../assets/textures/blue/mothership.png");
 
-    //red mosquito textures
-    Helpers::loadTextures(redMosquitoTextures, "../assets/textures/red/mosquito_$d.png");
-
-    //red eagle textures
-    Helpers::loadTextures(redEagleTextures, "../assets/textures/red/eagle_$d.png");
-
-    //red eagle textures
-    Helpers::loadTextures(redDragonTextures, "../assets/textures/red/dragon_$d.png");
-
     //Red explosion textures
     Helpers::loadTextures(redExplosionTextures, "../assets/textures/red/explosion_$d.png");
 
@@ -596,9 +512,6 @@ void Game::setRes(Resolution::Setting res){
     float factor = screen_w / 800.0;
 
     playerSpeed *= factor;
-    enemyMosquitoSpeed *= factor;
-    enemyEagleSpeed *= factor;
-    enemyDragonSpeed *= factor;
     playerBulletSpeed *= factor;
     enemyBulletSpeed *= factor;
     lifeScale *= factor;
@@ -797,43 +710,9 @@ void Game::initText(){
 
 void Game::spawnEnemies(){
     // Spawn as many enemies as enemyCount
-    for(int i = 0; i < enemyCount; i++){
-        int randNum = rand() % 100;
-
-        //70% chance for the enemy to be a mosquito
-        if(randNum < 70)
-            enemies.push_back(
-                Player_Ship{bus, ShipTypes::mosquito, Player_Ship::Team::red, (float)screen_w / 800, redMosquitoTextures, redBulletTexture}
-            );
-        
-
-        //20% chance for the enemy to be an eagle
-        else if(randNum < 90)
-            enemies.push_back(
-                Player_Ship{bus, ShipTypes::eagle, Player_Ship::Team::red, (float)screen_w / 800, redEagleTextures, redBulletTexture}
-            );
-        
-
-        //10% chance for the enemy to be a dragon
-        else
-            enemies.push_back(
-                Player_Ship{bus, ShipTypes::dragon, Player_Ship::Team::red, (float)screen_w / 800, redDragonTextures, redBulletTexture}
-            );
-        
-
-        //Set position
-        int y = (rand() % 2) * enemies.back().getRect().height;
-        int x = rand() % (int)(screen_w - enemies.back().getRect().width);
-        enemies.back().setPos(x, y);
-
-        //Flip Vertically so enemy faces the player
-        enemies.back().flipVertically();
-
-        //Setting shooting cooldown, overriding the ship type's cooldown
-        enemies.back().setMsBetweenShots(500);
-    }
+    for(int i = 0; i < enemyCount; i++)
+        spawner.spawnAI(enemies, sf::IntRect{0, 0, window.getSize().x, window.getSize().y});
 }
-
 
 //Function to check if a game object rectangle is outside the game window
 bool Game::outOfScreen(sf::FloatRect rect, int w, int h){

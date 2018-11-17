@@ -5,7 +5,12 @@ project(BulletHell)
 set(CMAKE_CXX_STANDARD 11)
 
 #Extended Warnings
-set(CMAKE_CXX_FLAGS -Wall)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+
+#Sanitizer
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined,address -fno-omit-frame-pointer")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -fsanitize=undefined,address -fno-omit-frame-pointer")
+
 
 set(SOURCE_FILES src/bulletHell.cpp 
                  src/helperFunctions/helperFunctions.cpp
@@ -21,6 +26,13 @@ set(SOURCE_FILES src/bulletHell.cpp
                  src/Bus/BusWriter.cpp
                  src/Bus/Message.cpp
                  src/AudioManager/AudioManager.cpp
+                 src/Spawner/Spawner.cpp
+                 src/Ship/Ship.cpp
+                 src/Ship/AI_Ship.cpp
+                 src/NewAnimation/Animation.cpp
+                 src/NewAnimation/SpriteSheet.cpp
+                 src/GameObject/GameObject.cpp
+                 src/AIComponent/AIComponent.cpp
                  extlibs/Collision/Collision.cpp)
 
 add_executable(bulletHell ${SOURCE_FILES})

@@ -12,6 +12,7 @@
 #include <cstdlib>  //Rand
 #include "../Bus/Bus.hpp"
 #include "../AudioManager/AudioManager.hpp"
+#include "../Spawner/Spawner.hpp"
 #include "../Background/Background.hpp"   //Moving, looping background
 #include "../Animation/Animation.hpp"    //Game object with looping animation
 #include "../Effect/Effect.hpp"       //Animation that plays once
@@ -29,6 +30,9 @@ class Game{
         //Bus and Bus Nodes
         Bus bus;
         AudioManager audioManager;
+
+        //Spawner
+        Spawner spawner;
 
         //Window
         sf::RenderWindow window;
@@ -57,10 +61,6 @@ class Game{
         std::array<sf::Texture, 3> blueEagleTextures;
         std::array<sf::Texture, 4> blueDragonTextures;
 
-        std::array<sf::Texture, 2> redMosquitoTextures;
-        std::array<sf::Texture, 3> redEagleTextures;
-        std::array<sf::Texture, 4> redDragonTextures;
-
         std::array<sf::Texture, 13> redExplosionTextures;
         std::array<sf::Texture, 13> blueExplosionTextures;
 
@@ -77,7 +77,7 @@ class Game{
         //Game objects
         std::unique_ptr<Background> bg;
         std::unique_ptr<Player_Ship> player;
-        std::vector<Player_Ship> enemies;
+        std::vector<AI_Ship> enemies;
         std::vector<sf::Sprite> playerBullets;
         std::vector<sf::Sprite> enemyBullets;
         std::vector<Effect> explosions;
@@ -101,9 +101,6 @@ class Game{
         //constants
         int maxPlayerHealth = 5;
         float playerSpeed = 420;
-        float enemyMosquitoSpeed = 210;
-        float enemyEagleSpeed = 150;
-        float enemyDragonSpeed = 90;
         float playerBulletSpeed = 600;
         float enemyBulletSpeed = 240;
         float bgSpeed = 1200;
