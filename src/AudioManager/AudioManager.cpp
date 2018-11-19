@@ -1,4 +1,5 @@
 #include "AudioManager.hpp"
+#include "../Ship/Ship.hpp"
 #include <iostream>
 
 AudioManager::AudioManager(Bus& bus):
@@ -35,6 +36,31 @@ void AudioManager::notify(Message msg){
     switch(msg.getType()){
         case Message::Type::SHIP_DEATH:
         shipExplosionSound.play();
+        break;
+
+        //Play ship shot sound effect
+        case Message::Type::SHIP_SHOT:{
+
+            //Downcast from BusWriter to Ship
+            Ship* ship = dynamic_cast<Ship*>(&msg.getCreator());
+            if(ship != NULL){
+                Ship::Team team = ship->getTeam();
+
+                //Choose sound to play based on team
+                switch(team){
+                    case Ship::Team::blue:
+                    blueShotSound.play();
+                    break;
+
+                    case Ship::Team::red:
+                    redShotSound.play();
+                    break;
+
+                    default:
+                    break;
+                }
+            }
+        }
         break;
 
         case Message::Type::BLUE_SHIP_SHOT:

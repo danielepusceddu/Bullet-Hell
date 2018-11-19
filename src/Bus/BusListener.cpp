@@ -7,6 +7,10 @@ busRef{std::ref(bus)}
     bus.addListener(*this);
 }
 
+Bus& BusListener::getBus(){
+    return busRef.get();
+}
+
 BusListener::~BusListener(){
     busRef.get().removeListener(*this);
 }

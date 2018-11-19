@@ -4,7 +4,7 @@
 
 class AI_Ship : public Ship{
     public:
-    AI_Ship(const SpriteSheet& spriteSheet);
+    AI_Ship(Bus& bus, const SpriteSheet& spriteSheet);
     void update(float timeDelta) override;
 
     private:

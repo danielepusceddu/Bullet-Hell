@@ -11,7 +11,14 @@ randEng{static_cast<unsigned long>(std::chrono::high_resolution_clock::now().tim
 
 //Update Method
 void AIComponent::update(Ship& ship, float delta){
+    //Shooting
+    if(ship.isReadyToShoot()){
+        std::uniform_int_distribution<int> shootChooser{0, 150};
+        if(shootChooser(randEng) == 0)
+            ship.shoot();
+    }
 
+    //Movement
     if(x_destination == -1)
         getNewDestination(ship);
 

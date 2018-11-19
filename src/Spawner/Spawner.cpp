@@ -1,12 +1,62 @@
 #include "Spawner.hpp"
 
-Spawner::Spawner():
+Spawner::Spawner(Bus& bus, std::vector<sf::Sprite>& bullets):
+BusListener{bus}, 
+bulletVec{bullets},
 randEng{static_cast<unsigned long>(std::chrono::high_resolution_clock::now().time_since_epoch().count())}
 {
+    redBullet.loadFromFile("../assets/textures/red/bullet.bmp");
     redMosquito.loadFromFile("../assets/textures/red/mosquito.png");
     redDragon.loadFromFile("../assets/textures/red/dragon.png");
     redEagle.loadFromFile("../assets/textures/red/eagle.png");
 }
+
+
+void Spawner::notify(Message msg){
+    switch(msg.getType()){
+        case Message::Type::SHIP_SHOT:{
+            Ship* ship = dynamic_cast<Ship*>(&msg.getCreator());
+            if(ship != NULL)
+                spawnBullet(*ship);
+        }
+        break;
+
+        default:
+        break;
+    }
+}
+
+
+void Spawner::spawnBullet(Ship& ship){
+    sf::Vector2f shipScale = ship.getScale();
+    sf::FloatRect shipRect = ship.getGlobalRect();
+    sf::Vector2f bulletPos;
+    sf::Vector2f bulletScale;
+    sf::Texture& bulletText = redBullet;
+
+    switch(ship.getType()){
+        default:
+        case Ship::Type::mosquito:{
+            bulletVec.push_back(sf::Sprite{bulletText});
+
+            bulletScale.x = shipScale.x * 2;
+            bulletScale.y = shipScale.y * 2;
+            bulletVec.back().setScale(bulletScale);
+
+            sf::FloatRect bulletRect = bulletVec.back().getGlobalBounds();
+            bulletPos.x = (shipRect.left + shipRect.width / 2) - (bulletRect.width / 2);
+            if(shipScale.y >= 0)
+                bulletPos.y = shipRect.top - bulletRect.height;
+
+            else
+                bulletPos.y = shipRect.top + shipRect.height + bulletRect.height;
+
+            bulletVec.back().setPosition(bulletPos);
+        }
+        break;
+    }
+}
+
 
 void Spawner::spawnAI(std::vector<AI_Ship>& enemyVec, sf::IntRect spawnBounds){
     std::uniform_int_distribution<int> posPicker{0, spawnBounds.width};
@@ -16,7 +66,7 @@ void Spawner::spawnAI(std::vector<AI_Ship>& enemyVec, sf::IntRect spawnBounds){
     sf::Texture& texture = texturePicker(shipType);
 
     //Create it
-    enemyVec.push_back(AI_Ship{SpriteSheet{texture, 512}});
+    enemyVec.push_back(AI_Ship{getBus(), SpriteSheet{texture, 512}});
     enemyVec.back().setType(shipType);
 
     //Flip it
@@ -26,6 +76,12 @@ void Spawner::spawnAI(std::vector<AI_Ship>& enemyVec, sf::IntRect spawnBounds){
 
     //Choose its spawn point
     spawnPosition(enemyVec.back(), spawnBounds);
+
+    //Choose its team
+    enemyVec.back().setTeam(Ship::Team::red);
+
+    //Set shot cooldown
+    enemyVec.back().setMinTimeBetweenShots(sf::milliseconds(300));
 
     //Set its space limits
     enemyVec.back().setBounds(sf::FloatRect{static_cast<float>(spawnBounds.left), 
@@ -64,6 +120,7 @@ sf::Texture& Spawner::texturePicker(Ship::Type shipType){
     sf::Texture* txt;
 
     switch(shipType){
+        default:
         case Ship::Type::mosquito:
         txt = &redMosquito;
         break;

@@ -3,10 +3,9 @@
 
 Ship::~Ship() = default;
 
-Ship::Ship(const SpriteSheet& spriteSheet):
-GameObject{spriteSheet.texture}, shipAnimation{sprite, spriteSheet.frameWidth}
+Ship::Ship(Bus& bus, const SpriteSheet& spriteSheet):
+BusWriter{bus}, GameObject{spriteSheet.texture}, shipAnimation{sprite, spriteSheet.frameWidth}
 {
-    //test stuff
     shipAnimation.setTimeBetweenFrames(sf::milliseconds(40));
     team = Team::neutral;
     type = Type::none;
@@ -20,6 +19,52 @@ void Ship::draw(sf::RenderWindow& window){
 
 void Ship::update(float timeDelta){
     shipAnimation.update(sprite);
+}
+
+
+bool Ship::shoot(){
+    bool shot;
+
+    if(isReadyToShoot()){
+        sf::Time now = clock.getElapsedTime();
+        sendMessage(Message{Message::Type::SHIP_SHOT, *this});
+        lastShot = now;
+        shot = true;
+    }
+
+    else shot = false;
+
+    return shot;
+}
+
+
+bool Ship::isReadyToShoot(){
+    if(readyToShoot == false){
+        sf::Time now = clock.getElapsedTime();
+        readyToShoot = (now - timeBetweenShots) >= lastShot;
+    }
+
+    return readyToShoot;
+}
+
+
+void Ship::setMinTimeBetweenShots(sf::Time time){
+    timeBetweenShots = time;
+}
+
+
+void Ship::setTeam(Ship::Team newTeam){
+    team = newTeam;
+}
+
+
+Ship::Team Ship::getTeam(){
+    return team;
+}
+
+
+Ship::Type Ship::getType(){
+    return type;
 }
 
 

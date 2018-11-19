@@ -9,6 +9,9 @@ class BusListener{
     virtual void notify(Message msg) = 0;
     virtual ~BusListener();
 
+    protected:
+    Bus& getBus();
+
     private:
     std::reference_wrapper<Bus> busRef;
 };

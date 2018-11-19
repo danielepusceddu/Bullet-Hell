@@ -1,7 +1,7 @@
 #include "AI_Ship.hpp"
 
-AI_Ship::AI_Ship(const SpriteSheet& spriteSheet): 
-Ship{spriteSheet}
+AI_Ship::AI_Ship(Bus& bus, const SpriteSheet& spriteSheet): 
+Ship{bus, spriteSheet}
 {
 
 }

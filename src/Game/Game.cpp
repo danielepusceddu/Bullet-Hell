@@ -351,7 +351,7 @@ void Game::handleInput(){
 //CONSTRUCTOR
 /////////////
 Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync):
-audioManager{bus}
+audioManager{bus}, spawner{bus, enemyBullets}
 {
 
     //Rand seed init
