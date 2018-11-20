@@ -30,4 +30,4 @@ namespace Helpers{
             texts[i].loadFromFile(pathCopy.replace(textNum, 2, number.str()));
         }
     }
-};
+}

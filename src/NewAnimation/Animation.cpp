@@ -7,8 +7,8 @@ sprite{&targetSprite}
     lastFrameSwitch = clock.getElapsedTime();
     sf::Vector2u sheetSize = sprite->getTexture()->getSize();
 
-    for(int i = 0; i < sheetSize.x; i += frameWidth)
-        frames.push_back(sf::IntRect{i, 0, (int)frameWidth, (int)sheetSize.y});
+    for(unsigned int i = 0; i < sheetSize.x; i += frameWidth)
+        frames.push_back(sf::IntRect{(int)i, 0, (int)frameWidth, (int)sheetSize.y});
         
     sprite->setTextureRect(frames[0]);
 }
@@ -19,7 +19,7 @@ void NewAnimation::update(sf::Sprite& target){
 
     //If enough time has passed, update current frame
     if(now - timeBetweenFrames >= lastFrameSwitch){
-        currentFrame = (currentFrame < frames.size() - 1) ? currentFrame + 1 : 0;
+        currentFrame = ((long unsigned int)currentFrame < frames.size() - 1) ? currentFrame + 1 : 0;
         target.setTextureRect(frames[currentFrame]);
         lastFrameSwitch = now;
     }

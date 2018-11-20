@@ -71,7 +71,7 @@ void Spawner::spawnAI(std::vector<AI_Ship>& enemyVec, sf::IntRect spawnBounds){
 
     //Flip it
     sf::Vector2f scale = enemyVec.back().getScale();
-    enemyVec.back().setScale(sf::Vector2f{0.2, scale.y * -1.0});
+    enemyVec.back().setScale(sf::Vector2f{0.2, scale.y * -1.0f});
     enemyVec.back().move(sf::Vector2f{0, enemyVec.back().getGlobalRect().height});
 
     //Choose its spawn point
@@ -94,7 +94,7 @@ void Spawner::spawnAI(std::vector<AI_Ship>& enemyVec, sf::IntRect spawnBounds){
 void Spawner::spawnPosition(AI_Ship& ship, sf::IntRect spawnBounds){
     std::uniform_int_distribution<int> xPicker{0, spawnBounds.width};
     std::uniform_int_distribution<int> yMultiplier{0, 2};
-    sf::Vector2f movement{xPicker(randEng), yMultiplier(randEng) * ship.getGlobalRect().height};
+    sf::Vector2f movement{static_cast<float>(xPicker(randEng)), yMultiplier(randEng) * ship.getGlobalRect().height};
     ship.move(movement);
 }
 

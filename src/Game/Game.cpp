@@ -709,9 +709,11 @@ void Game::initText(){
 
 
 void Game::spawnEnemies(){
+    sf::IntRect windowRect{0, 0, static_cast<int>(window.getSize().x), static_cast<int>(window.getSize().y)};
+
     // Spawn as many enemies as enemyCount
     for(int i = 0; i < enemyCount; i++)
-        spawner.spawnAI(enemies, sf::IntRect{0, 0, window.getSize().x, window.getSize().y});
+        spawner.spawnAI(enemies, windowRect);
 }
 
 //Function to check if a game object rectangle is outside the game window

@@ -4,7 +4,7 @@
 Ship::~Ship() = default;
 
 Ship::Ship(Bus& bus, const SpriteSheet& spriteSheet):
-BusWriter{bus}, GameObject{spriteSheet.texture}, shipAnimation{sprite, spriteSheet.frameWidth}
+GameObject{spriteSheet.texture}, BusWriter{bus}, shipAnimation{sprite, spriteSheet.frameWidth}
 {
     shipAnimation.setTimeBetweenFrames(sf::milliseconds(40));
     team = Team::neutral;

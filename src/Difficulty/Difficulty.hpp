@@ -6,4 +6,4 @@ namespace Difficulty{
 
     std::string difficultyToStr(Level difficulty);
     bool setDifficultyFromStr(std::string str, Level &difficulty);
-};
+}
