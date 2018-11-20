@@ -88,6 +88,23 @@ void Game::doActions(){
         }
     }
 
+    //Player Bullets - Enemy Ships
+    for(auto enemy = enemies.begin(); enemy != enemies.end(); enemy++){
+        for(auto i = playerBullets.begin(); i != playerBullets.end(); i++){
+            if(enemy->isHitBy(*i)){
+                enemy->damage(1);
+                i = playerBullets.erase(i);
+                i--;
+
+                if(enemy->isDead()){
+                    enemy = enemies.erase(enemy);
+                    enemy--;
+                    break;
+                }
+            }
+        }
+    }
+
 
     //If current wave has been destroyed, increase enemy count and spawn a new wave
     if(enemies.size() == 0){

@@ -1,5 +1,4 @@
 #include "Ship.hpp"
-#include <iostream>
 
 Ship::~Ship() = default;
 
@@ -48,6 +47,21 @@ bool Ship::isReadyToShoot(){
 }
 
 
+void Ship::damage(int dmg){
+    if(dead == false){
+        health -= dmg;
+        if(health <= 0){
+            dead = true;
+            sendMessage(Message{Message::Type::SHIP_DEATH, *this});
+        }
+    }
+}
+
+bool Ship::isDead(){
+    return dead;
+}
+
+
 void Ship::setMinTimeBetweenShots(sf::Time time){
     timeBetweenShots = time;
 }
@@ -75,16 +89,19 @@ void Ship::setType(Ship::Type newType){
         case Type::mosquito:
         setScale(sf::Vector2f{0.15, 0.15});
         setSpeed(210);
+        health = 15;
         break;
 
         case Type::eagle:
         setScale(sf::Vector2f{0.20, 0.20});
         setSpeed(150);
+        health = 20;
         break;
 
         case Type::dragon:
         setScale(sf::Vector2f{0.25, 0.25});
         setSpeed(90);
+        health = 30;
         break;
 
         default:

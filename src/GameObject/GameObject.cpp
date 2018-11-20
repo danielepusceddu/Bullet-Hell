@@ -1,5 +1,5 @@
 #include "GameObject.hpp"
-#include <iostream>
+#include "../../extlibs/Collision/Collision.h"
 
 //Constructor
 GameObject::GameObject(const sf::Texture& texture):
@@ -8,6 +8,12 @@ sprite{texture}
 }
 
 GameObject::~GameObject() = default;
+
+
+//Hit detection
+bool GameObject::isHitBy(sf::Sprite other){
+	return Collision::PixelPerfectTest(sprite, other);
+}
 
 
 //Setters

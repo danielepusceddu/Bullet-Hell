@@ -23,16 +23,21 @@ class Ship : public GameObject, public BusWriter{
 
     //Getters
     bool isReadyToShoot();
+    bool isDead();
     Type getType();
     Team getTeam();
 
     //Other
     virtual void update(float timeDelta);
-    bool shoot();
     void draw(sf::RenderWindow& window);
+    void damage(int dmg);
+    bool shoot();
+    
 
     protected:
     //Ship Information
+    bool dead = false;
+    int health = 5;
     Team team;
     Type type;
 

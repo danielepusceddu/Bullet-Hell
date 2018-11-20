@@ -30,6 +30,9 @@ class GameObject{
 	void moveRight(float timeDelta);
 	void moveDown(float timeDelta);
 
+	//Other
+	bool isHitBy(sf::Sprite other);
+
 	protected:
 	int speed = 1;
 	sf::FloatRect bounds;
