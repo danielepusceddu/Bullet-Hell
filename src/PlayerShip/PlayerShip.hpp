@@ -16,6 +16,7 @@ class Player_Ship : public Animation, public BusWriter{
         void damage(int dmg);
         bool isDead(){return dead;}
         void setHealth(int health);
+        int getHealth();
 
         //Constructor with ship type
         template<std::size_t SIZE>

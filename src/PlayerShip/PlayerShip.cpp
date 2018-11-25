@@ -82,6 +82,9 @@ void Player_Ship::flipVertically(){
     }
 }
 
+int Player_Ship::getHealth(){
+    return health;
+}
 
 void Player_Ship::setScale(float scale_x, float scale_y){
     Animation::setScale(scale_x, scale_y);

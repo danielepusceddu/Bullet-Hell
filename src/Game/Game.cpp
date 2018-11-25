@@ -255,18 +255,21 @@ void Game::handleInput(){
                 case sf::Keyboard::Num1:
                 case sf::Keyboard::Num8:
                 player->switchShipType(ShipTypes::eagle, blueEagleTextures);
+                player->setHealth(static_cast<int>(lives.size()));
                 break;
 
                 //Ship change 2
                 case sf::Keyboard::Num2:
                 case sf::Keyboard::Num9:
                 player->switchShipType(ShipTypes::mosquito, blueMosquitoTextures);
+                player->setHealth(static_cast<int>(lives.size()));
                 break;
 
                 //Ship change 3
                 case sf::Keyboard::Num3:
                 case sf::Keyboard::Num0:
                 player->switchShipType(ShipTypes::dragon, blueDragonTextures);
+                player->setHealth(static_cast<int>(lives.size()));
                 break;
 
                 //Fire
