@@ -86,3 +86,8 @@ void GameObject::moveDown(float timeDelta){
 	if(bounds.contains(newPos) && bounds.contains(newPos + sf::Vector2f{0, rect.height}))
 		sprite.move(movement);
 }
+
+//Other
+void GameObject::draw(sf::RenderWindow& window){
+	window.draw(sprite);
+}

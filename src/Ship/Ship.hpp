@@ -29,7 +29,7 @@ class Ship : public GameObject, public BusWriter{
 
     //Other
     virtual void update(float timeDelta);
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window) override;
     void damage(int dmg);
     bool shoot();
     

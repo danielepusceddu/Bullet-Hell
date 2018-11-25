@@ -11,13 +11,13 @@ GameObject{spriteSheet.texture}, BusWriter{bus}, shipAnimation{sprite, spriteShe
 }
 
 
-void Ship::draw(sf::RenderWindow& window){
-    window.draw(sprite);
+void Ship::update(float timeDelta){
+    shipAnimation.update(sprite);
 }
 
 
-void Ship::update(float timeDelta){
-    shipAnimation.update(sprite);
+void Ship::draw(sf::RenderWindow& window){
+    GameObject::draw(window);
 }
 
 

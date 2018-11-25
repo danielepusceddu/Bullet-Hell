@@ -31,6 +31,7 @@ class GameObject{
 	void moveDown(float timeDelta);
 
 	//Other
+	virtual void draw(sf::RenderWindow& window);
 	bool isHitBy(sf::Sprite other);
 
 	protected:
