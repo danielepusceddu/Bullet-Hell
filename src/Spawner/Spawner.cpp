@@ -1,10 +1,13 @@
 #include "Spawner.hpp"
 
-Spawner::Spawner(Bus& bus, std::vector<sf::Sprite>& bullets):
+Spawner::Spawner(Bus& bus, std::vector<sf::Sprite>& bullets, std::vector<Effect>& effectVec):
 BusListener{bus}, 
 bulletVec{bullets},
+effects{effectVec},
 randEng{static_cast<unsigned long>(std::chrono::high_resolution_clock::now().time_since_epoch().count())}
 {
+    blueExplosion.loadFromFile("../assets/textures/blue/explosion.png");
+    redExplosion.loadFromFile("../assets/textures/red/explosion.png");
     redBullet.loadFromFile("../assets/textures/red/bullet.bmp");
     redMosquito.loadFromFile("../assets/textures/red/mosquito.png");
     redDragon.loadFromFile("../assets/textures/red/dragon.png");
@@ -21,10 +24,40 @@ void Spawner::notify(Message msg){
         }
         break;
 
+        case Message::Type::SHIP_DEATH:{
+            Ship* ship = dynamic_cast<Ship*>(&msg.getCreator());
+            if(ship != NULL)
+                spawnExplosion(*ship);
+        }
+        break;
+
         default:
         break;
     }
 }
+
+
+void Spawner::spawnExplosion(const Ship& ship){
+    sf::Vector2f shipScale = ship.getScale();
+    sf::Vector2f explosionScale{shipScale.x * 4, shipScale.y * 4};
+    sf::Texture* explosion;
+
+    if(ship.getTeam() == Ship::Team::red)
+        explosion = &redExplosion;
+    
+    else explosion = &blueExplosion;
+    
+    effects.push_back(Effect{SpriteSheet{*explosion, 256}});
+    effects.back().setTimeBetweenFrames(sf::milliseconds(1000.0f / 60.0f));
+    effects.back().setScale(explosionScale);
+    effects.back().move(ship.getPos());
+    
+    if(shipScale.y < 0){
+        sf::FloatRect shipRect{ship.getGlobalRect()};
+        effects.back().move(sf::Vector2f{0, shipRect.height});
+    }
+}
+
 
 
 void Spawner::spawnBullet(Ship& ship){

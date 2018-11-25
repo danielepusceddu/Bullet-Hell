@@ -1,21 +1,34 @@
 #include "Effect.hpp"
 
-void Effect::play(){
-    this->playing = true; 
-    this->currentFrame = 0;
+//Constructor
+Effect::Effect(const SpriteSheet& sheet):
+GameObject{sheet.texture}, animation{sprite, sheet.frameWidth}
+{
+
 }
 
-bool Effect::isPlaying(){
-    return this->playing;
-}
+//Update
+void Effect::update(float timeDelta){
+    if(!finished){
+        animation.update(sprite);
 
-void Effect::drawNext(sf::RenderWindow &window){
-    if(this->playing){
-        //Get index of the frame drawn by drawAnimation
-        this->currentFrame = this->drawAnimation(window);
+        if(animation.getFrameIndex() > 0)
+            firstFrame = false;
 
-        //Stop playing if it's the last frame
-        if(this->currentFrame == this->frames.size() - 1)
-            this->playing = false;
+        else if(!firstFrame)
+            finished = true;
     }
+}
+
+void Effect::draw(sf::RenderWindow& window){
+    if(!finished)
+        window.draw(sprite);
+}
+
+void Effect::setTimeBetweenFrames(sf::Time time){
+    animation.setTimeBetweenFrames(time);
+}
+
+bool Effect::isFinished() const{
+    return finished;
 }

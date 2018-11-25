@@ -17,6 +17,7 @@ set(SOURCE_FILES src/bulletHell.cpp
                  src/Animation/Animation.cpp 
                  src/Background/Background.cpp 
                  src/Effect/Effect.cpp
+                 src/Effect/Effect.cpp
                  src/PlayerShip/PlayerShip.cpp
                  src/Game/Game.cpp
                  src/Resolution/Resolution.cpp

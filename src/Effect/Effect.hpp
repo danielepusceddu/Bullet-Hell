@@ -1,21 +1,25 @@
 #pragma once
-#include "../Animation/Animation.hpp"
+#include "../NewAnimation/SpriteSheet.hpp"
+#include "../GameObject/GameObject.hpp"
+#include "../NewAnimation/Animation.hpp"
 
-
-//Animation that plays once, starting from the first frame.
-class Effect : public Animation{
-    protected:
-        sf::Int32 lastTimeDrawn = 0;
-        bool playing = false;
-        unsigned int currentFrame = 0;
-
+class Effect : public GameObject{
     public:
-        //Constructor using initializer list
-        template<std::size_t SIZE> 
-        Effect(std::array<sf::Texture, SIZE> &textures) : Animation(textures){}
+    //Constructor
+    Effect(const SpriteSheet& sheet);
 
-        void play();
-        bool isPlaying();
-        void drawNext(sf::RenderWindow &window);
-        virtual ~Effect(){}
+    //Setters
+    void setTimeBetweenFrames(sf::Time time);
+
+    //Getters
+    bool isFinished() const;
+
+    //Other
+    void draw(sf::RenderWindow& window) override;
+    void update(float timeDelta) override;
+
+    private:
+    bool finished = false;
+    bool firstFrame = true;
+    NewAnimation animation;
 };

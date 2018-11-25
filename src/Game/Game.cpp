@@ -53,6 +53,10 @@ void Game::doMovement(){
     //Moving enemy bullets down
     for(sf::Sprite &bullet : enemyBullets)
         bullet.move(0, enemyBulletSpeed * delta);
+
+    //Updating explosions
+    for(Effect& explosion : explosions)
+        explosion.update(timePerFrame.asSeconds());
 }
 
 
@@ -95,13 +99,18 @@ void Game::doActions(){
                 enemy->damage(1);
                 i = playerBullets.erase(i);
                 i--;
-
-                if(enemy->isDead()){
-                    enemy = enemies.erase(enemy);
-                    enemy--;
-                    break;
-                }
             }
+        }
+    }
+
+
+    bus.notifyListeners();
+
+
+    for(auto enemy = enemies.begin(); enemy != enemies.end(); enemy++){
+        if(enemy->isDead()){
+            enemy = enemies.erase(enemy);
+            enemy--;
         }
     }
 
@@ -111,8 +120,6 @@ void Game::doActions(){
         enemyCount++;
         spawnEnemies();
     }
-
-    bus.notifyListeners();
 }
 
 
@@ -136,19 +143,18 @@ void Game::destroyObjects(){
         }
     }
 
+    //Removing finished explosions
+    for(auto i = explosions.begin(); i != explosions.end(); i++)
+        if(i->isFinished()){
+            i = explosions.erase(i);
+            i--;
+        }
+
 
     //Exploding player ship if health <= 0
     //This will disable player input and enemy shooting, and update score text + draw it
     if(player->isDead() && player->isInvisible() == false){
-        sf::Vector2f playerPos = player->getPos();
         player->toggleInvisibility();
-
-        //placing explosion effect
-        playerPos.x -= 20 * (screen_w / 1024);
-        explosions.push_back(Effect{blueExplosionTextures});
-        explosions.back().setPos(playerPos.x, playerPos.y);
-        explosions.back().setMsBetweenFrames(1000 / 60);
-        explosions.back().play();
 
         //Update score text and highscore
         updateScoreText();
@@ -182,7 +188,7 @@ void Game::render(){
 
     //Draw explosion effects
     for(Effect &explosion : explosions)
-        explosion.drawNext(window);
+        explosion.draw(window);
 
     //Draw lives left
     for(sf::Sprite life : lives)
@@ -368,7 +374,7 @@ void Game::handleInput(){
 //CONSTRUCTOR
 /////////////
 Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync):
-audioManager{bus}, spawner{bus, enemyBullets}
+audioManager{bus}, spawner{bus, enemyBullets, explosions}
 {
 
     //Rand seed init
@@ -408,13 +414,6 @@ audioManager{bus}, spawner{bus, enemyBullets}
 
     //player life texture
     playerLife.loadFromFile("../assets/textures/blue/mothership.png");
-
-    //Red explosion textures
-    Helpers::loadTextures(redExplosionTextures, "../assets/textures/red/explosion_$d.png");
-
-    //Blue explosion
-    Helpers::loadTextures(blueExplosionTextures, "../assets/textures/blue/explosion_$d.png");
-
 
     //Game Objects init
     std::cout << "Creating game objects..." << std::endl;

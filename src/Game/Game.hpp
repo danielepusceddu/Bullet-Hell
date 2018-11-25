@@ -15,7 +15,7 @@
 #include "../Spawner/Spawner.hpp"
 #include "../Background/Background.hpp"   //Moving, looping background
 #include "../Animation/Animation.hpp"    //Game object with looping animation
-#include "../Effect/Effect.hpp"       //Animation that plays once
+#include "../Effect/Effect.hpp"   //Animation that plays once
 #include "../PlayerShip/PlayerShip.hpp"  //Ship object with shoot methods etc.
 #include "../helperFunctions/helperFunctions.hpp"   //General helper functions
 #include "../Resolution/Resolution.hpp" //Namespace for resolution enum and related helper functions
@@ -60,9 +60,6 @@ class Game{
         std::array<sf::Texture, 2> blueMosquitoTextures;
         std::array<sf::Texture, 3> blueEagleTextures;
         std::array<sf::Texture, 4> blueDragonTextures;
-
-        std::array<sf::Texture, 13> redExplosionTextures;
-        std::array<sf::Texture, 13> blueExplosionTextures;
 
         //Text
         sf::Text scoreText;
