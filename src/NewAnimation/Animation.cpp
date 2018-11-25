@@ -25,6 +25,9 @@ void NewAnimation::update(sf::Sprite& target){
     }
 }
 
+int NewAnimation::getFrameIndex(){
+    return currentFrame;
+}
 
 void NewAnimation::setTimeBetweenFrames(sf::Time time){
     timeBetweenFrames = time;

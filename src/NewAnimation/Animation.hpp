@@ -16,6 +16,7 @@ class NewAnimation{
     //Getters
     const sf::Sprite& getSprite();
     const sf::IntRect& getFrame();
+    int getFrameIndex();
 
     //Modifiers
     void update(sf::Sprite& target);
