@@ -11,7 +11,7 @@ GameObject::~GameObject() = default;
 
 
 //Hit detection
-bool GameObject::isHitBy(sf::Sprite other){
+bool GameObject::isHitBy(sf::Sprite other) const{
 	return Collision::PixelPerfectTest(sprite, other);
 }
 
@@ -36,20 +36,24 @@ void GameObject::setScale(sf::Vector2f scale){
 
 //Getters
 
-int GameObject::getSpeed(){
+int GameObject::getSpeed() const{
 	return speed;
 }
 
-sf::FloatRect GameObject::getBounds(){
+sf::FloatRect GameObject::getBounds() const{
 	return bounds;
 }
 
-sf::FloatRect GameObject::getGlobalRect(){
+sf::FloatRect GameObject::getGlobalRect() const{
 	return sprite.getGlobalBounds();
 }
 
-sf::Vector2f GameObject::getScale(){
+sf::Vector2f GameObject::getScale() const{
 	return sprite.getScale();
+}
+
+sf::Vector2f GameObject::getPos() const{
+	return sprite.getPosition();
 }
 
 

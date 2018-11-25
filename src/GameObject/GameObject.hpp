@@ -19,10 +19,11 @@ class GameObject{
 	void setScale(sf::Vector2f scale);
 
 	//Getters
-	int getSpeed();
-	sf::FloatRect getBounds();
-	sf::FloatRect getGlobalRect();
-	sf::Vector2f getScale();
+	int getSpeed() const;
+	sf::FloatRect getBounds() const;
+	sf::FloatRect getGlobalRect() const;
+	sf::Vector2f getScale() const;
+	sf::Vector2f getPos() const;
 
 	//Movement
 	void move(sf::Vector2f movement);
@@ -32,7 +33,7 @@ class GameObject{
 
 	//Other
 	virtual void draw(sf::RenderWindow& window);
-	bool isHitBy(sf::Sprite other);
+	bool isHitBy(sf::Sprite other) const;
 
 	protected:
 	int speed = 1;

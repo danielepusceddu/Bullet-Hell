@@ -57,7 +57,7 @@ void Ship::damage(int dmg){
     }
 }
 
-bool Ship::isDead(){
+bool Ship::isDead() const{
     return dead;
 }
 
@@ -72,12 +72,12 @@ void Ship::setTeam(Ship::Team newTeam){
 }
 
 
-Ship::Team Ship::getTeam(){
+Ship::Team Ship::getTeam() const{
     return team;
 }
 
 
-Ship::Type Ship::getType(){
+Ship::Type Ship::getType() const{
     return type;
 }
 

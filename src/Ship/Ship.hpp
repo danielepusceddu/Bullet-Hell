@@ -23,9 +23,9 @@ class Ship : public GameObject, public BusWriter{
 
     //Getters
     bool isReadyToShoot();
-    bool isDead();
-    Type getType();
-    Team getTeam();
+    bool isDead() const;
+    Type getType() const;
+    Team getTeam() const;
 
     //Other
     virtual void update(float timeDelta);
