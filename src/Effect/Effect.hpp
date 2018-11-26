@@ -1,7 +1,7 @@
 #pragma once
-#include "../NewAnimation/SpriteSheet.hpp"
+#include "../Animation/SpriteSheet.hpp"
 #include "../GameObject/GameObject.hpp"
-#include "../NewAnimation/Animation.hpp"
+#include "../Animation/Animation.hpp"
 
 class Effect : public GameObject{
     public:
@@ -21,5 +21,5 @@ class Effect : public GameObject{
     private:
     bool finished = false;
     bool firstFrame = true;
-    NewAnimation animation;
+    Animation animation;
 };

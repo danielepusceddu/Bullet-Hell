@@ -38,8 +38,10 @@ void Game::doMovement(){
     //Background movement
     bg->moveDown(bgSpeed * delta);
 
+    player->update(timePerFrame.asSeconds());
+
     //Player movement based on input
-    playerMovement();
+    //playerMovement();
 
     //Enemy AI movement
     for(AI_Ship& enemy : enemies)
@@ -64,19 +66,6 @@ void Game::doMovement(){
 //Shooting and damage
 void Game::doActions(){
 
-    //If player is alive, enable player and enemy shooting
-    if(player->isDead() == false){
-        //Player shooting
-        if(shoot || shootToogle){
-            std::vector<sf::Sprite> shots = player->shoot();
-
-            if(shots.size())  //if bullets are shot
-                for(sf::Sprite &bullet : shots)
-                    playerBullets.push_back(bullet);
-            
-        }
-    }
-
     //Enemy bullets - player ship
     if(player->isDead() == false){
         for(auto i = enemyBullets.begin(); i != enemyBullets.end(); i++){
@@ -84,7 +73,7 @@ void Game::doActions(){
             //First check if the rectangles intersect, then check if bullet hits one of the hitboxes
             if(player->isHitBy(*i)){
                 player->damage(1);
-                player->flash(sf::Color::Red, 35);    //flash player red for 30ms
+                //player->flash(sf::Color::Red, 35); TODO    //flash player red for 30ms
                 i = enemyBullets.erase(i);
                 lives.pop_back();
                 i--;
@@ -153,12 +142,12 @@ void Game::destroyObjects(){
 
     //Exploding player ship if health <= 0
     //This will disable player input and enemy shooting, and update score text + draw it
-    if(player->isDead() && player->isInvisible() == false){
-        player->toggleInvisibility();
+//	if(player->isDead() && player->isInvisible() == false){
+//		player->toggleInvisibility() todo;
 
         //Update score text and highscore
-        updateScoreText();
-    }
+        //updateScoreText();
+    //}
 }
 
 
@@ -180,7 +169,7 @@ void Game::render(){
 
     //Draw player if alive
     if(player->isDead() == false)
-        player->drawAnimation(window);
+        player->draw(window);
 
     //Draw enemies
     for(AI_Ship &enemy : enemies)
@@ -244,128 +233,15 @@ void Game::handleInput(){
                     restart();
                 break;
 
-
-                //When Shift is pressed, slow player down by 50%
-                case sf::Keyboard::LShift:
-                case sf::Keyboard::RShift:
-                playerSpeed /= 1.5;
-                break;
-
-                //Ship change 1
-                case sf::Keyboard::Num1:
-                case sf::Keyboard::Num8:
-                player->switchShipType(ShipTypes::eagle, blueEagleTextures);
-                player->setHealth(static_cast<int>(lives.size()));
-                break;
-
-                //Ship change 2
-                case sf::Keyboard::Num2:
-                case sf::Keyboard::Num9:
-                player->switchShipType(ShipTypes::mosquito, blueMosquitoTextures);
-                player->setHealth(static_cast<int>(lives.size()));
-                break;
-
-                //Ship change 3
-                case sf::Keyboard::Num3:
-                case sf::Keyboard::Num0:
-                player->switchShipType(ShipTypes::dragon, blueDragonTextures);
-                player->setHealth(static_cast<int>(lives.size()));
-                break;
-
-                //Fire
-                case sf::Keyboard::Space:
-                shoot = true;
-                break;
-
-                //Fire toggle
-                case sf::Keyboard::G:
-                shootToogle = !shootToogle;
-                break;
-
-                //Start Movement
-                //Move Up
-                case sf::Keyboard::W:
-                case sf::Keyboard::I:
-                case sf::Keyboard::Up:
-                moveUp = true;
-                break;
-
-                //Move Down
-                case sf::Keyboard::S:
-                case sf::Keyboard::K:
-                case sf::Keyboard::Down:
-                moveDown = true;
-                break;
-
-                //Move Left
-                case sf::Keyboard::A:
-                case sf::Keyboard::J:
-                case sf::Keyboard::Left:
-                moveLeft = true;
-                break;
-
-                //Move Right
-                case sf::Keyboard::D:
-                case sf::Keyboard::L:
-                case sf::Keyboard::Right:
-                moveRight = true;
-                break;
-
                 default:
+                player->handleEvent(event);
                 break;
             }   //end key code switch
             break;  //end key pressed case
 
-            //Key released
-            case sf::Event::KeyReleased:
-            switch(event.key.code){
-                //Restore player speed
-                case sf::Keyboard::LShift:
-                case sf::Keyboard::RShift:
-                    playerSpeed *= 1.5;
-                break;
-
-                //Stop fire
-                case sf::Keyboard::Space:
-                shoot = false;
-                break;
-
-
-                //Stop Movement
-                //Move Up
-                case sf::Keyboard::W:
-                case sf::Keyboard::I:
-                case sf::Keyboard::Up:
-                moveUp = false;
-                break;
-
-                //Move Down
-                case sf::Keyboard::S:
-                case sf::Keyboard::K:
-                case sf::Keyboard::Down:
-                moveDown = false;
-                break;
-
-                //Move Left
-                case sf::Keyboard::A:
-                case sf::Keyboard::J:
-                case sf::Keyboard::Left:
-                moveLeft = false;
-                break;
-
-                //Move Right
-                case sf::Keyboard::D:
-                case sf::Keyboard::L:
-                case sf::Keyboard::Right:
-                moveRight = false;
-                break;
-
-                default:
-                break;
-            }   //end key released switch
-            break;
 
             default:
+            player->handleEvent(event);
             break;
         }   //end event type switch
 
@@ -379,6 +255,7 @@ void Game::handleInput(){
 Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync):
 audioManager{bus}, spawner{bus, enemyBullets, explosions}
 {
+    blueEagle.loadFromFile("../assets/textures/blue/eagle.png");
 
     //Rand seed init
     srand(std::time(NULL));
@@ -405,15 +282,6 @@ audioManager{bus}, spawner{bus, enemyBullets, explosions}
     //bullet textures
     blueBulletTexture.loadFromFile("../assets/textures/blue/bullet.bmp");
     redBulletTexture.loadFromFile("../assets/textures/red/bullet.bmp");
-
-    //blue eagle textures
-    Helpers::loadTextures(blueEagleTextures, "../assets/textures/blue/eagle_$d.png");
-
-    //blue mosquito textures
-    Helpers::loadTextures(blueMosquitoTextures, "../assets/textures/blue/mosquito_$d.png");
-
-    //blue dragon textures
-    Helpers::loadTextures(blueDragonTextures, "../assets/textures/blue/dragon_$d.png");
 
     //player life texture
     playerLife.loadFromFile("../assets/textures/blue/mothership.png");
@@ -541,14 +409,16 @@ void Game::setRes(Resolution::Setting res){
 void Game::initPlayer(){
     //Constructor with ship and bullet textures
     player = std::unique_ptr<Player_Ship>
-    (new Player_Ship(bus, ShipTypes::eagle, Player_Ship::Team::blue, (float)screen_w / 800,blueEagleTextures, blueBulletTexture));
+    (new Player_Ship(bus, SpriteSheet{blueEagle, 512}));
+
+    player->setScale(sf::Vector2f{0.3f, 0.3f});
+    player->setBounds(sf::FloatRect{0, 0, 1920, 1080});
 
     //Setting position
-    sf::FloatRect playerRect = player->getRect();
-    player->setPos((screen_w / 2) - (playerRect.width / 2), screen_h - playerRect.height);
+    sf::FloatRect playerRect = player->getGlobalRect();
+    player->setPos(sf::Vector2f{(screen_w / 2) - (playerRect.width / 2), screen_h - playerRect.height});
+    player->setSpeed(420);
 
-    //Setting health
-    player->setHealth(maxPlayerHealth);
 }
 
 
@@ -630,14 +500,15 @@ void Game::initLifeIndicators(){
 
 void Game::restart(){
     //Resetting Player
-    sf::FloatRect playerRect = player->getRect();
-
-    if(player->isInvisible())
-        player->toggleInvisibility();
-
-    player->setHealth(maxPlayerHealth);
-    player->setPos((screen_w / 2) - (playerRect.width / 2), screen_h - playerRect.height);
-
+    initPlayer();
+//	sf::FloatRect playerRect = player->getRect();
+//
+//	if(player->isInvisible())
+//		player->toggleInvisibility();
+//
+//	player->setHealth(maxPlayerHealth);
+//	player->setPos((screen_w / 2) - (playerRect.width / 2), screen_h - playerRect.height);
+//
     //Resetting Life sprites
     initLifeIndicators();
 
@@ -746,23 +617,4 @@ bool Game::outOfScreen(sf::FloatRect rect, int w, int h){
         out = true;
 
     return out;
-}
-
-
-void Game::playerMovement(){
-    //Move left if key is pressed
-    if(moveLeft)
-        player->moveLeft(playerSpeed * delta, 0);
-
-    //Move right if key is pressed
-    if(moveRight)
-        player->moveRight(playerSpeed * delta, screen_w);
-
-    //Move up if key is pressed
-    if(moveUp)
-        player->moveUp(playerSpeed * delta, 0);
-
-    //Move down if key is pressed
-    if(moveDown)
-        player->moveDown(playerSpeed * delta, screen_h);
 }

@@ -14,11 +14,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
 
 set(SOURCE_FILES src/bulletHell.cpp 
                  src/helperFunctions/helperFunctions.cpp
-                 src/Animation/Animation.cpp 
                  src/Background/Background.cpp 
                  src/Effect/Effect.cpp
                  src/Effect/Effect.cpp
-                 src/PlayerShip/PlayerShip.cpp
                  src/Game/Game.cpp
                  src/Resolution/Resolution.cpp
                  src/Difficulty/Difficulty.cpp
@@ -30,8 +28,10 @@ set(SOURCE_FILES src/bulletHell.cpp
                  src/Spawner/Spawner.cpp
                  src/Ship/Ship.cpp
                  src/Ship/AI_Ship.cpp
-                 src/NewAnimation/Animation.cpp
-                 src/NewAnimation/SpriteSheet.cpp
+                 src/Ship/Player_Ship.cpp
+                 src/InputComponent/InputComponent.cpp
+                 src/Animation/Animation.cpp
+                 src/Animation/SpriteSheet.cpp
                  src/GameObject/GameObject.cpp
                  src/AIComponent/AIComponent.cpp
                  extlibs/Collision/Collision.cpp)

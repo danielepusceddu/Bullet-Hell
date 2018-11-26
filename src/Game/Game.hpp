@@ -16,7 +16,7 @@
 #include "../Background/Background.hpp"   //Moving, looping background
 #include "../Animation/Animation.hpp"    //Game object with looping animation
 #include "../Effect/Effect.hpp"   //Animation that plays once
-#include "../PlayerShip/PlayerShip.hpp"  //Ship object with shoot methods etc.
+#include "../Ship/Player_Ship.hpp"  //Ship object with shoot methods etc.
 #include "../helperFunctions/helperFunctions.hpp"   //General helper functions
 #include "../Resolution/Resolution.hpp" //Namespace for resolution enum and related helper functions
 #include "../Difficulty/Difficulty.hpp" //Namespace for difficulty enum and related helper functions
@@ -56,10 +56,7 @@ class Game{
         sf::Texture blueBulletTexture;
         sf::Texture redBulletTexture;
         sf::Texture playerLife;
-
-        std::array<sf::Texture, 2> blueMosquitoTextures;
-        std::array<sf::Texture, 3> blueEagleTextures;
-        std::array<sf::Texture, 4> blueDragonTextures;
+        sf::Texture blueEagle;
 
         //Text
         sf::Text scoreText;

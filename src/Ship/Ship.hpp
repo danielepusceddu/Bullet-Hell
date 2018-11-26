@@ -2,8 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include "../Bus/BusWriter.hpp"
 #include "../GameObject/GameObject.hpp"
-#include "../NewAnimation/Animation.hpp"
-#include "../NewAnimation/SpriteSheet.hpp"
+#include "../Animation/Animation.hpp"
+#include "../Animation/SpriteSheet.hpp"
 
 class Ship : public GameObject, public BusWriter{
     public:
@@ -42,7 +42,7 @@ class Ship : public GameObject, public BusWriter{
     Type type;
 
     //Ship Animation
-    NewAnimation shipAnimation;
+    Animation shipAnimation;
 
     //Shot Timing
     sf::Clock clock;
