@@ -1,11 +1,13 @@
 #include "Spawner.hpp"
 
-Spawner::Spawner(Bus& bus, std::vector<sf::Sprite>& bullets, std::vector<Effect>& effectVec):
+Spawner::Spawner(Bus& bus, std::vector<sf::Sprite>& bullets, std::vector<sf::Sprite>&bluebullets, std::vector<Effect>& effectVec):
 BusListener{bus}, 
-bulletVec{bullets},
+redBullets{bullets},
+blueBullets{bluebullets},
 effects{effectVec},
 randEng{static_cast<unsigned long>(std::chrono::high_resolution_clock::now().time_since_epoch().count())}
 {
+    blueBullet.loadFromFile("../assets/textures/blue/bullet.bmp");
     blueExplosion.loadFromFile("../assets/textures/blue/explosion.png");
     redExplosion.loadFromFile("../assets/textures/red/explosion.png");
     redBullet.loadFromFile("../assets/textures/red/bullet.bmp");
@@ -61,11 +63,12 @@ void Spawner::spawnExplosion(const Ship& ship){
 
 
 void Spawner::spawnBullet(Ship& ship){
+    std::vector<sf::Sprite>& bulletVec = (ship.getTeam() == Ship::Team::blue) ? blueBullets : redBullets;
     sf::Vector2f shipScale = ship.getScale();
     sf::FloatRect shipRect = ship.getGlobalRect();
     sf::Vector2f bulletPos;
     sf::Vector2f bulletScale;
-    sf::Texture& bulletText = redBullet;
+    sf::Texture& bulletText = (ship.getTeam() == Ship::Team::blue) ? blueBullet : redBullet;
 
     switch(ship.getType()){
         default:

@@ -8,7 +8,7 @@
 
 class Spawner : public BusListener{
     public:
-    Spawner(Bus &bus, std::vector<sf::Sprite>& bullets, std::vector<Effect>& effects);
+    Spawner(Bus &bus, std::vector<sf::Sprite>& bullets, std::vector<sf::Sprite>&bluebullets, std::vector<Effect>& effects);
     void notify(Message msg) override;
     void spawnAI(std::vector<AI_Ship>& enemyVec, sf::IntRect spawnBounds);
 
@@ -21,13 +21,15 @@ class Spawner : public BusListener{
     sf::Texture& texturePicker(Ship::Type shipType);
 
     //Container references
-    std::vector<sf::Sprite>& bulletVec;
+    std::vector<sf::Sprite>& redBullets;
+    std::vector<sf::Sprite>& blueBullets;
     std::vector<Effect>& effects;
 
     //Random
     std::default_random_engine randEng;
 
     //Textures
+    sf::Texture blueBullet;
     sf::Texture blueExplosion;
     sf::Texture redExplosion;
     sf::Texture redBullet;

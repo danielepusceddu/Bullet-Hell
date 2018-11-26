@@ -253,7 +253,7 @@ void Game::handleInput(){
 //CONSTRUCTOR
 /////////////
 Game::Game(Resolution::Setting res, Difficulty::Level dfculty, bool vsync):
-audioManager{bus}, spawner{bus, enemyBullets, explosions}
+audioManager{bus}, spawner{bus, enemyBullets, playerBullets, explosions}
 {
     blueEagle.loadFromFile("../assets/textures/blue/eagle.png");
 
@@ -418,7 +418,8 @@ void Game::initPlayer(){
     sf::FloatRect playerRect = player->getGlobalRect();
     player->setPos(sf::Vector2f{(screen_w / 2) - (playerRect.width / 2), screen_h - playerRect.height});
     player->setSpeed(420);
-
+    player->setTeam(Ship::Team::blue);
+    player->setMinTimeBetweenShots(sf::milliseconds(50));
 }
 
 
