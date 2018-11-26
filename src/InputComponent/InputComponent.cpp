@@ -25,6 +25,12 @@ void InputComponent::handleEvent(sf::Event event){
     switch(event.type){
         case sf::Event::KeyPressed:
         modifier = true;
+        switch(event.key.code){
+            case sf::Keyboard::G:
+            shootToggle = !shootToggle;
+            default:
+            break;
+        }
         break;
 
         case sf::Event::KeyReleased:
@@ -39,10 +45,6 @@ void InputComponent::handleEvent(sf::Event event){
     switch(event.key.code){
         case sf::Keyboard::Space:
         shoot = modifier;
-        break;
-
-        case sf::Keyboard::G:
-        shootToggle = !shootToggle;
         break;
 
         //Start Movement
