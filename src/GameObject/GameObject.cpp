@@ -81,6 +81,15 @@ void GameObject::moveRight(float timeDelta){
 		sprite.move(movement);
 }
 
+void GameObject::moveUp(float timeDelta){
+	sf::Vector2f currentPos{sprite.getPosition()};
+	sf::Vector2f movement{0, -(speed * timeDelta)};
+	sf::Vector2f newPos{currentPos + movement};
+
+	if(bounds.contains(newPos))
+		sprite.move(movement);
+}
+
 void GameObject::moveDown(float timeDelta){
 	sf::Vector2f currentPos{sprite.getPosition()};
 	sf::Vector2f movement{0, speed * timeDelta};

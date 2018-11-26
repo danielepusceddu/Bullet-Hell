@@ -29,6 +29,7 @@ class GameObject{
 	void move(sf::Vector2f movement);
 	void moveLeft(float timeDelta);
 	void moveRight(float timeDelta);
+	void moveUp(float timeDelta);
 	void moveDown(float timeDelta);
 
 	//Other
