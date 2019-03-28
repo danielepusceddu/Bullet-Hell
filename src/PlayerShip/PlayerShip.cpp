@@ -8,6 +8,10 @@
 
 void Player_Ship::setHealth(int health){
     this->health = health;
+
+    if(health <= 0)
+        dead = true;
+    else dead = false;
 }
 
 
