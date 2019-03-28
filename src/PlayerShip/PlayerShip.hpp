@@ -98,8 +98,10 @@ void Player_Ship::switchShipType(ShipTypes type, std::array<sf::Texture, SIZE> &
     //Clear shooting points
     this->shootingPoints.clear();
 
-    //Add shooting points for new ship type
+    //Add shooting points for new ship type and keep current health
+    int oldHealth = health;
     this->initShipType(type);
+    health = oldHealth;
 
     //Get new ship center
     sf::FloatRect newShipRect = this->getRect();
